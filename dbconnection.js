@@ -1,10 +1,12 @@
 const mysql2 = require('mysql2');
+
 const connection = mysql2.createConnection({
     host: 'localhost',
     database: 'inventory',
     user:'root',
-    password:'12345',
+    password:'Abc321',
 });
+
 connection.connect(function(err){
     if(err){
         console.error('Error Connecting');
@@ -13,4 +15,4 @@ connection.connect(function(err){
     console.log('connected successfully');
 });
 
-module.exports = connection;
+module.exports=connection;
