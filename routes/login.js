@@ -13,7 +13,7 @@ router.post("/", (req, res) => {
             if (err) {
                 res.send({err: err});
             }
-            if (result) {
+            if (result.length > 0) {
                 res.send(result);
             }
             else {
