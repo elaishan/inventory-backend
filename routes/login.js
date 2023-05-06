@@ -7,11 +7,11 @@ const router = express.Router();
  router.post("/", (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
-    const user_privileges = req.body.user_privileges;
+    const userprivileges = req.body.userprivileges;
 
     connection.query(
         `SELECT * FROM users WHERE username = ? AND password = ?` ,
-        [username, password, user_privileges],
+        [username, password, userprivileges],
             (err, result) => {
         
             if (err) {
@@ -24,16 +24,16 @@ const router = express.Router();
             else {
                 res.send({message: "Wrong user/pass"});
             }
-//someone is logged in or not
-router.get("/", (req, res) => {
+// //someone is logged in or not
+// router.get("/", (req, res) => {
 
-    if(username == null && password == null){ //checks if someone is logged in
-        res.send("someone is not logged in!")
-    }
-    else{
-        res.send("someone is logged in")
-    }
-})
+//     if(username == null && password == null){ //checks if someone is logged in
+//         res.send("someone is not logged in!")
+//     }
+//     else{
+//         res.send("someone is logged in")
+//     }
+// })
             
         /*  
             //checking password
