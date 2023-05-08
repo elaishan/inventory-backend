@@ -35,7 +35,7 @@ connection.query(checkQuery,function(err, result, fields)
             })
             
         }else{
-            res.send("product is already existing")
+            res.send({message: "product is already existing"})
         }
         
     }
