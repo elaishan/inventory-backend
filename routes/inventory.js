@@ -11,28 +11,46 @@ router.post("/insertstocks", (req,res) => {
     const form = req.body.form;
     const price = req.body.price;
     const expiration = req.body.expiration_date;
-    const branchID = req.body.branch_id;
+    const branchID = req.body.branchid;
 
-//query for inserting to table "stocks"
-    connection.query(
-    "INSERT INTO stocks (name, description, quantity, cost, form, price, expiration_date, branch_id) VALUES ("+"\"" 
-    + name + "\"," + "\"" + description + "\"," +  quantity + "," + cost + "," + "\"" + form + "\"" + "," 
-    + price + "," + "\"" + expiration + "\"," + branchID + ")",
-    function(err, result,fields){  
+const checkQuery = "SELECT * FROM stocks WHERE name =" + "\"" + name +  "\"";
+
+connection.query(checkQuery,function(err, result, fields)
+    {
     if (err){
-        res.send(err);
+        res.send(err)
     }
     else{
-       res.send("successfully inserted")
+        if(result.length == 0){ //checks if product exists or not, if there's no result (0), insert it if there is, dont.
+            //insert query
+            const insertQuery = "INSERT INTO stocks (name, description, quantity, cost, form, price, expiration_date, branchid) VALUES ("+"\""  + name + "\"," + "\"" + description + "\"," +  quantity + "," + cost + "," + "\"" + form + "\"" + "," 
+             + price + "," + "\"" + expiration + "\"," + branchID +  ")"
+
+            connection.query(insertQuery, function(err, result, fields){
+                if(err){
+                    res.send(err)
+                }else{
+                    res.send("product successfully inserted")
+                }
+            })
+            
+        }else{
+            res.send("product is already existing")
+        }
+        
     }
 })
 });
 
-//SELECT
-router.get("/viewstocks", (req,res) => {
+/*========================================================================================================================*/
 
+//SELECT
+//view single agent
+
+router.get("/viewstocks/:productid", (req,res) => {
+    const id = req.params.productid
     //query for viewing
-    connection.query(` SELECT * FROM stocks`,function(error, result, fields){
+    connection.query("SELECT * FROM stocks WHERE productid = " + "\"" + id + "\"" , function(error, result, fields){
         if(error){
             console.error(error)
         }else{
@@ -41,9 +59,48 @@ router.get("/viewstocks", (req,res) => {
     })
 });
 
+//view all product
+router.get("/viewstocks/", (req,res) => {
+    //query for viewing
+    connection.query("SELECT * FROM stocks", function(error, result, fields){
+        if(error){
+            console.error(error)
+        }else{
+            res.send(result)
+        }
+    })
+});
+/*
+router.get("/viewstocks/", (req,res) => {
+
+
+    let urlProductId = "WHERE productid = " + "\"" + req.query.productid + "\""
+    let urlSortBy = "ORDER BY " + req.query.orderBy + " " + req.query.criteria
+
+    let url = ""
+
+    if(Number.isInteger(parseInt(req.query.productid))){
+        url = urlProductId
+    }else if(req.query.orderBy){
+        url = urlSortBy
+    }
+    //query for viewing
+    console.log(url)
+    connection.query("SELECT * FROM stocks " + url  , function(error, result, fields){
+        if(error){
+            console.error(error)
+        }else{
+            res.send(result)
+        }
+    })
+});
+*/
+
+/*========================================================================================================================*/
+
 //EDIT
-router.post("/editstocks", (req,res) => {
-    const id = req.body.product_id;
+router.post("/editstocks/:productid", (req,res) => {
+    const id = req.params.productid;
     const name = req.body.name;
     const description = req.body.description;
     const quantity = req.body.quantity;
@@ -51,11 +108,11 @@ router.post("/editstocks", (req,res) => {
     const form = req.body.form;
     const price = req.body.price;
     const expiration = req.body.expiration_date;
-    const branchID = req.body.branch_id;
+    const branchID = req.body.branchid;
 
     const sql = "UPDATE stocks SET name = " + "\"" + name + "\"" + ", description = " + "\"" + description + "\"" + 
     ", quantity = " + quantity + ", cost = " + cost + ", form = " + "\"" + form + "\"" + ", price = " + price + ", expiration_date = " +
-    "\"" + expiration + "\"" + ", branch_id = " + branchID + " WHERE product_id = " + id
+    "\"" + expiration + "\"" + ", branchid = " + branchID + " WHERE productid = " + id
 
     connection.query(sql, (err, result) => {
         if(err){
@@ -70,12 +127,14 @@ router.post("/editstocks", (req,res) => {
     })
 });
 
+/*========================================================================================================================*/
+
 //DELETE
-router.delete("/deletestocks", (req,res) => {
-    const id = req.body.product_id
+router.delete("/deletestocks/:id", (req,res) => {
+    const id = req.params.id;
 
     //query for deleting
-    connection.query(`DELETE FROM stocks WHERE product_id =` + id, function(error,result, fields){
+    connection.query(`DELETE FROM stocks WHERE productid = ` + id, function(error,result, fields){
         if(error){
             console.log("error:" + error)
         }
