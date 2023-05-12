@@ -2,7 +2,6 @@ const connection = require("../dbconnection");
 const express = require("express");
 const router = express.Router();
 
-
 //INSERT
 router.post("/insertagents", (req,res) => {
     const firstname = req.body.a_firstname;
@@ -11,51 +10,38 @@ router.post("/insertagents", (req,res) => {
     const phonenum = req.body.a_phonenum;
     const quota = req.body.a_quota;
     const branchID = req.body.branchid;
-    const productname = req.body.productname;
-    const productQuantity = req.body.productquantity;
-    const expiration_date = req.body.expiration_date;
+    const productID = req.body.productid;
     const returnID = req.body.return_id;
     const backorderID = req.body.backorder_id;
 
-    const checkProductQuery = "SELECT * FROM stocks WHERE name =" + "\"" + productname +  "\"";
-    connection.query(checkProductQuery, function(err, productResult, fields) {
-        if (err){
-            res.send(err)
-        } else {
-            if (productResult.length == 0) {
-                res.send("Invalid product name");
-            } else {
-                const productQuantityInStock = productResult[0].quantity;
-                if (productQuantityInStock === 0) {
-                    res.send("Not enough product in stock");
-                } else {
-                    const insertQuery = "INSERT INTO agents (a_firstname, a_middlename, a_lastname, a_phonenum, a_quota, branchid, productname, productquantity, expiration_date, return_id, backorder_id) VALUES ("+"\"" + firstname + "\"," + "\"" + middlename + "\"," + "\"" + lastname + "\"," + phonenum + ","  + quota  + "," + branchID + "," + "\"" + productname + "\"," + productQuantity  + "," + "\"" + expiration_date + "\"," + returnID + "," + backorderID +  ")";
+//checks if agent is already existing
+const checkQuery = "SELECT * FROM agents WHERE a_firstname =" + "\"" + firstname +  "\"" + "and a_lastname =" + "\"" + lastname +  "\"";
 
-                    connection.query(insertQuery, function(err, insertResult, fields){
-                        if(err){
-                            res.send(err)
-                        } else {
-                            const updateQuery = "UPDATE stocks SET quantity = GREATEST(quantity - " + productQuantity + ", 0) WHERE branchid = " + branchID + " AND name = " + "\"" + productname + "\"" + " AND expiration_date <= \"" + expiration_date + "\" ORDER BY expiration_date ASC LIMIT 1";
-                            connection.query(updateQuery, function(err, updateResult, fields){
-                                if(err){
-                                    res.send(err)
-                                } else {
-                                    if (updateResult.affectedRows == 0) {
-                                        res.send("Insufficient stock for the specified branch and product");
-                                    } else {
-                                        res.send("Agent successfully inserted");
-                                    }
-                                }
-                            });
-                        }
-                    });
+connection.query(checkQuery,function(err, result, fields)
+    {
+    if (err){
+        res.send(err)
+    }
+    else{
+        if(result.length == 0){ //checks if username exists or not, if there's no result (0), insert it if there is, dont.
+            //insert query
+            const insertQuery = "INSERT INTO agents (a_firstname, a_middlename, a_lastname, a_phonenum, a_quota, branchid, productid, return_id, backorder_id) VALUES ("+"\"" + firstname + "\"," + "\"" + middlename + "\"," + "\"" + lastname + "\"," + phonenum + ","  + quota  + "," + branchID + ","  + productID + "," + returnID + "," + backorderID +  ")"
+
+            connection.query(insertQuery, function(err, result, fields){
+                if(err){
+                    res.send(err)
+                }else{
+                    res.send("agent successfully inserted")
                 }
-            }
+            })
+            
+        }else{
+            res.send("agent is already existing")
         }
-    });
+        
+    }
+})
 });
-
-
 
 /*========================================================================================================================*/
 
@@ -90,22 +76,20 @@ router.get("/viewagents/", (req,res) => {
 
 //EDIT
 router.post("/editagents", (req,res) => {
-    const id = req.body.agentid
+    const id = req.body.agentid;
     const firstname = req.body.a_firstname;
     const middlename = req.body.a_middlename;
     const lastname = req.body.a_lastname;
     const phonenum = req.body.a_phonenum;
     const quota = req.body.a_quota;
     const branchID = req.body.branchid;
-    const productname = req.body.productname;
-    const productQuantity = req.body.productquantity;
-    const expiration_date = req.body.expiration_date;
+    const productID = req.body.productid;
     const returnID = req.body.return_id;
     const backorderID = req.body.backorder_id;
 
     const sql = "UPDATE agents SET a_firstname = " + "\"" + firstname + "\"" + ", a_middlename = " + "\"" + middlename + "\"" + 
-    ", a_lastname = " + "\"" + lastname + "\"" + ", a_phonenum = " + phonenum + ", a_quota = " + quota  + ", branchid = " + branchID + ", productname = " 
-   + "\"" + productname + "\"" + ", productquantity =" + productQuantity + ", expiration_date =" + "\"" + expiration_date + "\""  +", return_id = " + returnID + ", backorder_id = "  + backorderID + " WHERE agentid = " + id
+    ", a_lastname = " + "\"" + lastname + "\"" + ", a_phonenum = " + phonenum + ", a_quota = " + quota  + ", branchid = " + branchID + ", productid = " 
+    + productID  + ", return_id = " + returnID + ", backorder_id = "  + backorderID + " WHERE agentid = " + id
 
     connection.query(sql, (err, result) => {
         if(err){

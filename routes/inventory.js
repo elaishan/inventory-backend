@@ -129,53 +129,53 @@ router.get("/viewstocks/:productid", (req,res) => {
     })
 });
 
-router.get("/viewstocks/", (req,res) => {
-    const id = req.body.productid;
-    const sortBy = req.query.sortBy;
-    const allowedSortBy = ["productcode", "name", "category", "manufacturer", "cost", "form", "price", "expiration_date", "lotnumber", "branchid", "packquantity"];
-    const querySortBy = allowedSortBy.includes(sortBy) ? sortBy : "productcode"; // default to sorting by productcode
-    
-    const query = `
-        SELECT s.productcode, s.name, s.category, s.manufacturer, 
-            (SELECT SUM(packquantity) FROM stocks WHERE productid = s.productid) AS total_packquantity
-        FROM stocks s
-        WHERE s.productid = "${id}"
-        GROUP BY s.productcode, s.name, s.category, s.manufacturer
-        ORDER BY ${querySortBy}
-    `;
-    
-    connection.query(query, function(error, result, fields){
-        if(error){
-            console.error(error);
-            res.status(500).send("Internal server error");
-        }else{
-            res.send(result);
-        }
-    });
-});
-
-
 // router.get("/viewstocks/", (req,res) => {
-//     let urlProductId = "WHERE productid = " + "\"" + req.query.productid + "\""
-//     let urlSortBy = "ORDER BY " + req.query.orderBy + " " + req.query.criteria
-
-//     let url = ""
-
-//     if(Number.isInteger(parseInt(req.query.productid))){
-//         url = urlProductId
-//     }else if(req.query.orderBy){
-//         url = urlSortBy
-//     }
-//     //query for viewing
-//     //console.log(url)
-//     connection.query("SELECT * FROM stocks " + url  , function(error, result, fields){
+//     const id = req.body.productid;
+//     const sortBy = req.query.sortBy;
+//     const allowedSortBy = ["productcode", "name", "category", "manufacturer", "cost", "form", "price", "expiration_date", "lotnumber", "branchid", "packquantity"];
+//     const querySortBy = allowedSortBy.includes(sortBy) ? sortBy : "productcode"; // default to sorting by productcode
+    
+//     const query = `
+//         SELECT s.productcode, s.name, s.category, s.manufacturer, 
+//             (SELECT SUM(packquantity) FROM stocks WHERE productid = s.productid) AS total_packquantity
+//         FROM stocks s
+//         WHERE s.productid = "${id}"
+//         GROUP BY s.productcode, s.name, s.category, s.manufacturer
+//         ORDER BY ${querySortBy}
+//     `;
+    
+//     connection.query(query, function(error, result, fields){
 //         if(error){
-//             console.error(error)
+//             console.error(error);
+//             res.status(500).send("Internal server error");
 //         }else{
-//             res.send(result)
+//             res.send(result);
 //         }
-//     })
+//     });
 // });
+
+
+router.get("/viewstocks/", (req,res) => {
+    let urlProductId = "WHERE productid = " + "\"" + req.query.productid + "\""
+    let urlSortBy = "ORDER BY " + req.query.orderBy + " " + req.query.criteria
+
+    let url = ""
+
+    if(Number.isInteger(parseInt(req.query.productid))){
+        url = urlProductId
+    }else if(req.query.orderBy){
+        url = urlSortBy
+    }
+    //query for viewing
+    //console.log(url)
+    connection.query("SELECT * FROM stocks " + url  , function(error, result, fields){
+        if(error){
+            console.error(error)
+        }else{
+            res.send(result)
+        }
+    })
+});
 
 
 
