@@ -10,7 +10,6 @@ router.post("/insertuser", (req, res) => {
     const firstName = req.body.fname;
     const middleName = req.body.mname;
     const lastName = req.body.lname;
-    const position = req.body.position;
     const userPrivilege = req.body.userprivilege;
     const branchID = req.body.branchid;
   
@@ -22,7 +21,7 @@ router.post("/insertuser", (req, res) => {
       } else {
         if (result[0].count === 0) {
           const insertQuery =
-            "INSERT INTO users (username, password, fname, mname, lname, position, userprivilege, branchid) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO users (username, password, fname, mname, lname, userprivilege, branchid) VALUES (?, ?, ?, ?, ?, ?, ?)";
   
           connection.query(
             insertQuery,
@@ -32,7 +31,6 @@ router.post("/insertuser", (req, res) => {
               firstName,
               middleName,
               lastName,
-              position,
               userPrivilege,
               branchID,
             ],
@@ -85,7 +83,7 @@ router.get("/viewusers/", (req,res) => {
 //EDIT
 router.put("/edituser/:id", (req, res) => {
   const id = req.params.id;
-  const { username, password, fname, mname, lname, position, userprivilege, branchid } = req.body;
+  const { username, password, fname, mname, lname, userprivilege, branchid } = req.body;
 
   // Check if id is valid
   if (!id) {
@@ -107,8 +105,8 @@ router.put("/edituser/:id", (req, res) => {
       return;
     }
     // Update user
-    const sqlUpdate = "UPDATE users SET username = ?, password = ?, fname = ?, mname = ?, lname = ?, position = ?, userprivilege = ?, branchid = ? WHERE userid = ?";
-    connection.query(sqlUpdate, [username, password, fname, mname, lname, position, userprivilege, branchid, id], (err, result) => {
+    const sqlUpdate = "UPDATE users SET username = ?, password = ?, fname = ?, mname = ?, lname = ?, userprivilege = ?, branchid = ? WHERE userid = ?";
+    connection.query(sqlUpdate, [username, password, fname, mname, lname, userprivilege, branchid, id], (err, result) => {
       if (err) {
         console.log(err);
         res.status(500).send("Error updating user.");

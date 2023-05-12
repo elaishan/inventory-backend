@@ -43,7 +43,7 @@ router.get("/viewclients/:clientid", (req,res) => {
 });
 
 //view all client
-router.get("/viewsclients/", (req,res) => {
+router.get("/viewclients/", (req,res) => {
     //query for viewing
     connection.query("SELECT * FROM clients", function(error, result, fields){
         if(error){
