@@ -2,10 +2,10 @@ const connection = require("../dbconnection");
 const express = require("express");
 const router = express.Router();
 
-//INSERT - ayos
+//INSERT
 router.post("/insertstocks", (req,res) => {
+    
     const productCode =  req.body.productcode;
-    const name = req.body.name;
     const description = req.body.description;
     const category = req.body.category
     const packquantity = req.body.packquantity;
@@ -19,25 +19,25 @@ router.post("/insertstocks", (req,res) => {
     const lotNumber = req.body.lotnumber;
     const branchID = req.body.branchid;
 
-    // Check if the product code already exists with a different name
-    const whereClause = `productcode != '${productCode}' AND name = '${name}'`;
+    // Check if the product code already exists with a different description
+    const whereClause = `productcode != '${productCode}' AND description = '${description}'`;
     const selectSql = `SELECT * FROM stocks WHERE ${whereClause}`;
     connection.query(selectSql, function(err, result, fields) {
         if (err) {
             res.send(err);
         } 
         else if (result.length > 0) {
-            // A matching name exists, so send an error message
-            res.send("A different product code already exists for the same name");
+            // A matching description exists, so send an error message
+            res.send("A different product code already exists for the same description");
         } 
         else {
-            const selectSql2 = `SELECT name FROM stocks WHERE productcode = '${productCode}'`;
+            const selectSql2 = `SELECT description FROM stocks WHERE productcode = '${productCode}'`;
             connection.query(selectSql2, function(err, result, fields) {
                 if (err) {
                     res.send(err);
                 } 
-                else if (result.length > 0 && result[0].name !== name) {
-                    res.send("A different name already exists for the same product code");
+                else if (result.length > 0 && result[0].description !== description) {
+                    res.send("A different description already exists for the same product code");
                 }
                 else {
                     const selectSql3 = `SELECT form FROM stocks WHERE productcode = '${productCode}'`;
@@ -68,7 +68,7 @@ router.post("/insertstocks", (req,res) => {
                                         }
                                         else {
                                             // Check if a matching row already exists
-                                            const whereClause = `productcode = '${productCode}' AND name = '${name}' AND category = '${category}' AND manufacturer = '${manufacturer}' AND form = '${form}' AND expiration_date = '${expiration}' AND lotnumber = '${lotNumber}' AND branchid = '${branchID}'`;
+                                            const whereClause = `productcode = '${productCode}' AND description = '${description}' AND category = '${category}' AND manufacturer = '${manufacturer}' AND form = '${form}' AND expiration_date = '${expiration}' AND lotnumber = '${lotNumber}' AND branchid = '${branchID}'`;
                                             const selectSql6 = `SELECT * FROM stocks WHERE ${whereClause}`;
                                             connection.query(selectSql6, function(err, result, fields) {
                                                 if (err) {
@@ -76,7 +76,7 @@ router.post("/insertstocks", (req,res) => {
                                                 } 
                                                 else if (result.length > 0) {
                                                     // A matching row exists, so update it
-                                                    const updateSql = `UPDATE stocks SET packquantity = packquantity + ${packquantity}, description =  "${description}", reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
+                                                    const updateSql = `UPDATE stocks SET packquantity = packquantity + ${packquantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
                                                     connection.query(updateSql, function(err, result, fields) {
                                                         if (err) {
                                                             res.send(err);
@@ -88,8 +88,8 @@ router.post("/insertstocks", (req,res) => {
                                                 } 
                                                 else {
                                                     // No matching row exists, so insert a new row
-                                                    const insertSql = `INSERT INTO stocks (productcode, name, description, category, packquantity, packsize, reorderlevel, manufacturer, cost, form, price, expiration_date, lotnumber, branchid) 
-                                                                    VALUES ('${productCode}', '${name}', '${description}', '${category}', ${packquantity}, ${packsize}, ${reOrderLevel}, '${manufacturer}', ${cost}, '${form}', ${price}, '${expiration}', '${lotNumber}', ${branchID})`;
+                                                    const insertSql = `INSERT INTO stocks (productcode, description, category, packquantity, packsize, reorderlevel, manufacturer, cost, form, price, expiration_date, lotnumber, branchid) 
+                                                                    VALUES ('${productCode}', '${description}', '${category}', ${packquantity}, ${packsize}, ${reOrderLevel}, '${manufacturer}', ${cost}, '${form}', ${price}, '${expiration}', '${lotNumber}', ${branchID})`;
                                                     connection.query(insertSql, function(err, result, fields) {
                                                         if (err) {
                                                             res.send(err);
@@ -132,15 +132,15 @@ router.get("/viewstocks/:productid", (req,res) => {
 // router.get("/viewstocks/", (req,res) => {
 //     const id = req.body.productid;
 //     const sortBy = req.query.sortBy;
-//     const allowedSortBy = ["productcode", "name", "category", "manufacturer", "cost", "form", "price", "expiration_date", "lotnumber", "branchid", "packquantity"];
+//     const allowedSortBy = ["productcode", "description", "category", "manufacturer", "cost", "form", "price", "expiration_date", "lotnumber", "branchid", "packquantity"];
 //     const querySortBy = allowedSortBy.includes(sortBy) ? sortBy : "productcode"; // default to sorting by productcode
     
 //     const query = `
-//         SELECT s.productcode, s.name, s.category, s.manufacturer, 
+//         SELECT s.productcode, s.description, s.category, s.manufacturer, 
 //             (SELECT SUM(packquantity) FROM stocks WHERE productid = s.productid) AS total_packquantity
 //         FROM stocks s
 //         WHERE s.productid = "${id}"
-//         GROUP BY s.productcode, s.name, s.category, s.manufacturer
+//         GROUP BY s.productcode, s.description, s.category, s.manufacturer
 //         ORDER BY ${querySortBy}
 //     `;
     
@@ -186,7 +186,6 @@ router.get("/viewstocks/", (req,res) => {
 router.post("/editstocks", (req, res) => {
     const id = req.body.productid;
     const productCode = req.body.productcode;
-    const name = req.body.name;
     const description = req.body.description;
     const category = req.body.category;
     const packquantity = req.body.packquantity;
@@ -200,15 +199,15 @@ router.post("/editstocks", (req, res) => {
     const lotNumber = req.body.lotnumber;
     const branchID = req.body.branchid;
 
-    // Check if the new product code or name already exists for a different product
-    const checkQuery = "SELECT COUNT(*) AS count FROM stocks WHERE (productcode = ? OR name = ?) AND (productcode <> ? OR name <> ?)";
-    const checkParams = [productCode, name, productCode, name];
+    // Check if the new product code or description already exists for a different product
+    const checkQuery = "SELECT COUNT(*) AS count FROM stocks WHERE (productcode = ? OR description = ?) AND (productcode <> ? OR description <> ?)";
+    const checkParams = [productCode, description, productCode, description];
 
     connection.query(checkQuery, checkParams, function (err, result, fields) {
         if (err) {
             res.send(err);
         } else if (result[0].count > 0) {
-            res.send("Product code or name already exists for another product");
+            res.send("Product code or description already exists for another product");
         } else {
             const selectSql = `SELECT form FROM stocks WHERE productcode = '${productCode}'`;
             connection.query(selectSql, function(err, result, fields) {
@@ -235,35 +234,41 @@ router.post("/editstocks", (req, res) => {
                                     res.send("A different manufacturer already exists for the same product code");
                                 } else {
                                     // Check if a matching row already exists
-                                    const whereClause = `productcode = '${productCode}' AND name = '${name}' AND category = '${category}' AND manufacturer = '${manufacturer}' AND form = '${form}' AND expiration_date = '${expiration}' AND lotnumber = '${lotNumber}' AND branchid = '${branchID}'`;
+                                    const whereClause = `productcode = '${productCode}' AND description = '${description}' AND category = '${category}' AND manufacturer = '${manufacturer}' AND form = '${form}' AND expiration_date = '${expiration}' AND lotnumber = '${lotNumber}' AND branchid = '${branchID}'`;
                                     const selectSql6 = `SELECT * FROM stocks WHERE ${whereClause}`;
                                     connection.query(selectSql6, function(err, result, fields) {
                                         if (err) {
                                             res.send(err);
                                         } else if (result.length > 0) {
                                             // A matching row exists, so update it
-                                            const updateSql = `UPDATE stocks SET packquantity = packquantity + ${packquantity}, description =  "${description}", reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
-                                            connection.query(updateSql, function(err, result, fields) {
-                                                if (err) {
-                                                    res.send(err);
+                                        const updateSql = `UPDATE stocks SET packquantity = packquantity + ${packquantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
+                                        connection.query(updateSql, function(err, updateResult, fields) {
+                                            if (err) {
+                                                res.send(err);
+                                            } else {
+                                                // check if the update changed any columns
+                                                if (updateResult.affectedRows == 0 && updateResult.changedRows == 0) {
+                                                    res.send("No changes were made to the product.");
                                                 } else {
-                                                    //delete the row if the required columns are equal to an existing row and add the packquantity to that existing row
+                                                    // delete the row if the required columns are equal to an existing row and add the packquantity to that existing row
                                                     const deleteQuery = `DELETE FROM stocks WHERE productid = ${id}`;
-                                                    connection.query(deleteQuery, function (err, result, fields) {
+                                                    connection.query(deleteQuery, function (err, deleteResult, fields) {
                                                         if (err) {
                                                             res.send(err);
-                                                        } else {
+                                                        }
+                                                         else {
                                                             res.send("Product successfully merged.");
                                                         }
                                                     });
                                                 }
-                                            });
+                                            }
+                                        });
                                         } else {
-                                            const updateQuery = "UPDATE stocks SET productcode = ?, name = ?, description = ?, category = ?, packquantity = ?, packsize = ?, reorderlevel = ?, manufacturer = ?, cost = ?, form = ?, price = ?, expiration_date = ?, lotnumber = ?, branchid = ? WHERE productid = ?";
-                                            const updateParams = [productCode, name, description, category, packquantity, packsize, reOrderLevel, manufacturer, cost, form, price, expiration, lotNumber, branchID, id];
+                                            const updateQuery = "UPDATE stocks SET productcode = ?, description = ?, category = ?, packquantity = ?, packsize = ?, reorderlevel = ?, manufacturer = ?, cost = ?, form = ?, price = ?, expiration_date = ?, lotnumber = ?, branchid = ? WHERE productid = ?";
+                                            const updateParams = [productCode, description, category, packquantity, packsize, reOrderLevel, manufacturer, cost, form, price, expiration, lotNumber, branchID, id];
 
                                             // Check for empty values
-                                            if (!productCode || !name || !category || !manufacturer || !form) {
+                                            if (!productCode || !description || !category || !manufacturer || !form) {
                                                 res.send("Required fields cannot be empty");
                                             } else {
                                                 connection.query(updateQuery, updateParams, function (err, result, fields) {
