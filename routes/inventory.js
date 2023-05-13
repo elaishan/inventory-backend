@@ -183,8 +183,8 @@ router.get("/viewstocks/", (req,res) => {
 /*========================================================================================================================*/
 
 //EDIT
-router.post("/editstocks", (req, res) => {
-    const id = req.body.productid;
+router.post("/editstocks/:productid", (req, res) => {
+    const id = req.params.productid;
     const productCode = req.body.productcode;
     const description = req.body.description;
     const category = req.body.category;
