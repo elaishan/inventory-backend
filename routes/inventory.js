@@ -37,7 +37,7 @@ router.post("/insertstocks", (req,res) => {
                     res.send(err);
                 } 
                 else if (result.length > 0 && result[0].description !== description) {
-                    res.send("A different description already exists for the same product code");
+                    res.send({message:"A different description already exists for the same product code"});
                 }
                 else {
                     const selectSql3 = `SELECT form FROM stocks WHERE productcode = '${productCode}'`;
@@ -46,7 +46,7 @@ router.post("/insertstocks", (req,res) => {
                             res.send(err);
                         }
                         else if (result.length > 0 && result[0].form !== form) {
-                            res.send("A different form already exists for the same product code");
+                            res.send({message:"A different form already exists for the same product code"});
                         }
                         else {
                             const selectSql4 = `SELECT category FROM stocks WHERE productcode = '${productCode}'`;
@@ -55,7 +55,7 @@ router.post("/insertstocks", (req,res) => {
                                     res.send(err);
                                 }
                                 else if (result.length > 0 && result[0].category !== category) {
-                                    res.send("A different category already exists for the same product code");
+                                    res.send({message:"A different category already exists for the same product code"});
                                 }
                                 else {
                                     const selectSql5 = `SELECT manufacturer FROM stocks WHERE productcode = '${productCode}'`;
@@ -64,7 +64,7 @@ router.post("/insertstocks", (req,res) => {
                                             res.send(err);
                                         }
                                         else if (result.length > 0 && result[0].manufacturer !== manufacturer) {
-                                            res.send("A different manufacturer already exists for the same product code");
+                                            res.send({message:"A different manufacturer already exists for the same product code"});
                                         }
                                         else {
                                             // Check if a matching row already exists
