@@ -28,7 +28,7 @@ router.post("/insertstocks", (req,res) => {
         } 
         else if (result.length > 0) {
             // A matching description exists, so send an error message
-            res.send("A different product code already exists for the same description");
+            res.send({message:"A different product code already exists for the same description"});
         } 
         else {
             const selectSql2 = `SELECT description FROM stocks WHERE productcode = '${productCode}'`;
@@ -37,7 +37,7 @@ router.post("/insertstocks", (req,res) => {
                     res.send(err);
                 } 
                 else if (result.length > 0 && result[0].description !== description) {
-                    res.send("A different description already exists for the same product code");
+                    res.send({message:"A different description already exists for the same product code"});
                 }
                 else {
                     const selectSql3 = `SELECT form FROM stocks WHERE productcode = '${productCode}'`;
@@ -46,7 +46,7 @@ router.post("/insertstocks", (req,res) => {
                             res.send(err);
                         }
                         else if (result.length > 0 && result[0].form !== form) {
-                            res.send("A different form already exists for the same product code");
+                            res.send({message: "A different form already exists for the same product code"});
                         }
                         else {
                             const selectSql4 = `SELECT category FROM stocks WHERE productcode = '${productCode}'`;
@@ -55,7 +55,7 @@ router.post("/insertstocks", (req,res) => {
                                     res.send(err);
                                 }
                                 else if (result.length > 0 && result[0].category !== category) {
-                                    res.send("A different category already exists for the same product code");
+                                    res.send({message: "A different category already exists for the same product code"});
                                 }
                                 else {
                                     const selectSql5 = `SELECT manufacturer FROM stocks WHERE productcode = '${productCode}'`;
@@ -64,7 +64,7 @@ router.post("/insertstocks", (req,res) => {
                                             res.send(err);
                                         }
                                         else if (result.length > 0 && result[0].manufacturer !== manufacturer) {
-                                            res.send("A different manufacturer already exists for the same product code");
+                                            res.send({message: "A different manufacturer already exists for the same product code"});
                                         }
                                         else {
                                             // Check if a matching row already exists
@@ -82,7 +82,7 @@ router.post("/insertstocks", (req,res) => {
                                                             res.send(err);
                                                         } 
                                                         else {
-                                                            res.send("successfully updated");
+                                                            res.send({success: "successfully updated"});
                                                         }
                                                     });
                                                 } 
@@ -95,7 +95,7 @@ router.post("/insertstocks", (req,res) => {
                                                             res.send(err);
                                                         } 
                                                         else {
-                                                            res.send("successfully inserted");
+                                                            res.send({success: "successfully inserted"});
                                                         }
                                                     });
                                                 }
@@ -183,8 +183,8 @@ router.get("/viewstocks/", (req,res) => {
 /*========================================================================================================================*/
 
 //EDIT
-router.post("/editstocks", (req, res) => {
-    const id = req.body.productid;
+router.post("/editstocks/:productid", (req, res) => {
+    const id = req.params.productid;
     const productCode = req.body.productcode;
     const description = req.body.description;
     const category = req.body.category;
@@ -207,7 +207,7 @@ router.post("/editstocks", (req, res) => {
         if (err) {
             res.send(err);
         } else if (result[0].count > 0) {
-            res.send("Product code or description already exists for another product");
+            res.send({message :"Product code or description already exists for another product"});
         } else {
             const selectSql = `SELECT form FROM stocks WHERE productcode = '${productCode}'`;
             connection.query(selectSql, function(err, result, fields) {
@@ -215,7 +215,7 @@ router.post("/editstocks", (req, res) => {
                     res.send(err);
                 }
                 else if (result.length > 0 && result[0].form !== form) {
-                    res.send("A different form already exists for the same product code"); 
+                    res.send({message :"A different form already exists for the same product code"}); 
                 } else {
                     const selectSql2 = `SELECT category FROM stocks WHERE productcode = '${productCode}'`;
                     connection.query(selectSql2, function(err, result, fields) {
@@ -223,7 +223,7 @@ router.post("/editstocks", (req, res) => {
                             res.send(err);
                         }
                         else if (result.length > 0 && result[0].category !== category) {
-                            res.send("A different category already exists for the same product code");
+                            res.send({message :"A different category already exists for the same product code"});
                         } else {
                             const selectSql3 = `SELECT manufacturer FROM stocks WHERE productcode = '${productCode}'`;
                             connection.query(selectSql3, function(err, result, fields) {
@@ -231,7 +231,7 @@ router.post("/editstocks", (req, res) => {
                                     res.send(err);
                                 }
                                 else if (result.length > 0 && result[0].manufacturer !== manufacturer) {
-                                    res.send("A different manufacturer already exists for the same product code");
+                                    res.send({message :"A different manufacturer already exists for the same product code"});
                                 } else {
                                     // Check if a matching row already exists
                                     const whereClause = `productcode = '${productCode}' AND description = '${description}' AND category = '${category}' AND manufacturer = '${manufacturer}' AND form = '${form}' AND expiration_date = '${expiration}' AND lotnumber = '${lotNumber}' AND branchid = '${branchID}'`;
@@ -239,28 +239,23 @@ router.post("/editstocks", (req, res) => {
                                     connection.query(selectSql6, function(err, result, fields) {
                                         if (err) {
                                             res.send(err);
-                                        } else if (result.length > 0) {
+                                        } else if (result.length > 1) {
                                             // A matching row exists, so update it
                                         const updateSql = `UPDATE stocks SET packquantity = packquantity + ${packquantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
                                         connection.query(updateSql, function(err, updateResult, fields) {
                                             if (err) {
                                                 res.send(err);
                                             } else {
-                                                // check if the update changed any columns
-                                                if (updateResult.affectedRows == 0 && updateResult.changedRows == 0) {
-                                                    res.send("No changes were made to the product.");
-                                                } else {
-                                                    // delete the row if the required columns are equal to an existing row and add the packquantity to that existing row
-                                                    const deleteQuery = `DELETE FROM stocks WHERE productid = ${id}`;
-                                                    connection.query(deleteQuery, function (err, deleteResult, fields) {
-                                                        if (err) {
-                                                            res.send(err);
-                                                        }
-                                                         else {
-                                                            res.send("Product successfully merged.");
-                                                        }
-                                                    });
-                                                }
+                                                // delete the row if the required columns are equal to an existing row and add the packquantity to that existing row
+                                                const deleteQuery = `DELETE FROM stocks WHERE productid = ${id}`;
+                                                connection.query(deleteQuery, function (err, deleteResult, fields) {
+                                                    if (err) {
+                                                        res.send(err);
+                                                    }
+                                                    else {
+                                                        res.send({success: "Product successfully merged."});
+                                                    }
+                                                });  
                                             }
                                         });
                                         } else {
@@ -269,13 +264,40 @@ router.post("/editstocks", (req, res) => {
 
                                             // Check for empty values
                                             if (!productCode || !description || !category || !manufacturer || !form) {
-                                                res.send("Required fields cannot be empty");
+                                                res.send({message :"Required fields cannot be empty"});
                                             } else {
                                                 connection.query(updateQuery, updateParams, function (err, result, fields) {
                                                     if (err) {
                                                         res.send(err);
                                                     } else {
-                                                        res.send("Product successfully updated");
+                                                        const whereClause = `productcode = '${productCode}' AND description = '${description}' AND category = '${category}' AND manufacturer = '${manufacturer}' AND form = '${form}' AND expiration_date = '${expiration}' AND lotnumber = '${lotNumber}' AND branchid = '${branchID}'`;
+                                                        const selectSql6 = `SELECT * FROM stocks WHERE ${whereClause}`;
+                                                        connection.query(selectSql6, function(err, result, fields) {
+                                                            if (err) {
+                                                                res.send(err);
+                                                            } else if (result.length > 1) {
+                                                                // A matching row exists, so update it
+                                                                const updateSql = `UPDATE stocks SET packquantity = packquantity + ${packquantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
+                                                                connection.query(updateSql, function(err, updateResult, fields) {
+                                                                    if (err) {
+                                                                        res.send(err);
+                                                                    } else {
+                                                                        // delete the row if the required columns are equal to an existing row and add the packquantity to that existing row
+                                                                        const deleteQuery = `DELETE FROM stocks WHERE productid = ${id}`;
+                                                                        connection.query(deleteQuery, function (err, deleteResult, fields) {
+                                                                            if (err) {
+                                                                                res.send(err);
+                                                                            }
+                                                                            else {
+                                                                                res.send({success: "Product successfully merged."});
+                                                                            }
+                                                                        });  
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                res.send({success: "Product successfully updated"});
+                                                            }
+                                                        });
                                                     }
                                                 });
                                             }
