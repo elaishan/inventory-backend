@@ -66,24 +66,24 @@ router.get("/viewclients/", (req,res) => {
 /*========================================================================================================================*/
 
 //UPDATE
-router.post("/editclients/:clientid", (req, res) => {
+router.put("/editclients/:clientid", (req, res) => {
   const { clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms } = req.body;
   const id = req.params.clientid;
 
-  const selectSql = `SELECT * FROM clients WHERE clientcode = '${clientcode}'`;
+  const selectSql = `SELECT * FROM clients WHERE clientcode = '${clientcode}' AND clientid != '${id}'`;
 
   // Query to check if client already exists
   connection.query(selectSql, function (err, result, fields) {
     if (err) {
       // Return error message to client
       res.send(err);
-    } else if (result.length > 0 && result[0].clientid !== id) {
+    } else if (result.length > 0) {
       // Return error message to client if client already exists
-      res.send(`Client code is already existing.`);
+      res.send("Client code is already existing.");
     } else {
       // Query to update the client in table "clients"
-      const updateSql = `UPDATE clients SET clientcode = ${clientcode}, name = "${name}", phonenumber = "${phonenumber}", areacode = "${areacode}", areaname = "${areaname}",
-      agentcode = ${agentcode}, creditlimit = ${creditlimit},  terms = ${terms} WHERE clientid = ${id}`;
+      const updateSql = `UPDATE clients SET clientcode = '${clientcode}', name = '${name}', phonenumber = '${phonenumber}', areacode = '${areacode}', areaname = '${areaname}',
+      agentcode = '${agentcode}', creditlimit = '${creditlimit}', terms = '${terms}' WHERE clientid = '${id}'`;
 
       connection.query(updateSql, function (err, result, fields) {
         if (err) {
@@ -91,12 +91,13 @@ router.post("/editclients/:clientid", (req, res) => {
           res.send(err);
         } else {
           // Return success message to client
-          res.send("Client Successfully updated.");
+          res.send("Client updated successfully.");
         }
       });
     }
   });
 });
+
 
 
 /*========================================================================================================================*/
