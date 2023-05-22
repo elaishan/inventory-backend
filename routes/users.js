@@ -38,12 +38,12 @@ router.post("/insertuser", (req, res) => {
               if (err) {
                 res.status(500).send(err);
               } else {
-                res.send("User successfully inserted");
+                res.send({success: "User successfully inserted"});
               }
             }
           );
         } else {
-          res.status(409).send("User already exists");
+          res.status(409).send({message: "User already exists"});
         }
       }
     });
