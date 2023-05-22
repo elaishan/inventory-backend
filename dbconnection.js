@@ -4,6 +4,7 @@ const connection = mysql2.createConnection({
     host: 'localhost',
     database: 'inventory',
     user:'root',
+
     password:'12345',
 });
 
