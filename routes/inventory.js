@@ -8,8 +8,7 @@ router.post("/insertstocks", (req,res) => {
     const productCode =  req.body.productcode;
     const description = req.body.description;
     const category = req.body.category
-    const packquantity = req.body.packquantity;
-    const packsize =  req.body.packsize;
+    const quantity = req.body.quantity;
     const reOrderLevel =  req.body.reorderlevel;
     const manufacturer =  req.body.manufacturer;
     const cost = req.body.cost;
@@ -76,7 +75,7 @@ router.post("/insertstocks", (req,res) => {
                                                 } 
                                                 else if (result.length > 0) {
                                                     // A matching row exists, so update it
-                                                    const updateSql = `UPDATE stocks SET packquantity = packquantity + ${packquantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
+                                                    const updateSql = `UPDATE stocks SET quantity = quantity + ${quantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
                                                     connection.query(updateSql, function(err, result, fields) {
                                                         if (err) {
                                                             res.send(err);
@@ -88,8 +87,8 @@ router.post("/insertstocks", (req,res) => {
                                                 } 
                                                 else {
                                                     // No matching row exists, so insert a new row
-                                                    const insertSql = `INSERT INTO stocks (productcode, description, category, packquantity, packsize, reorderlevel, manufacturer, cost, form, price, expiration_date, lotnumber, branchid) 
-                                                                    VALUES ('${productCode}', '${description}', '${category}', ${packquantity}, ${packsize}, ${reOrderLevel}, '${manufacturer}', ${cost}, '${form}', ${price}, '${expiration}', '${lotNumber}', ${branchID})`;
+                                                    const insertSql = `INSERT INTO stocks (productcode, description, category, quantity, reorderlevel, manufacturer, cost, form, price, expiration_date, lotnumber, branchid) 
+                                                                    VALUES ('${productCode}', '${description}', '${category}', ${quantity}, ${reOrderLevel}, '${manufacturer}', ${cost}, '${form}', ${price}, '${expiration}', '${lotNumber}', ${branchID})`;
                                                     connection.query(insertSql, function(err, result, fields) {
                                                         if (err) {
                                                             res.send(err);
@@ -188,8 +187,7 @@ router.post("/editstocks/:productid", (req, res) => {
     const productCode = req.body.productcode;
     const description = req.body.description;
     const category = req.body.category;
-    const packquantity = req.body.packquantity;
-    const packsize = req.body.packsize;
+    const quantity = req.body.quantity;
     const reOrderLevel = req.body.reorderlevel;
     const manufacturer = req.body.manufacturer;
     const cost = req.body.cost;
@@ -241,12 +239,12 @@ router.post("/editstocks/:productid", (req, res) => {
                                             res.send(err);
                                         } else if (result.length > 1) {
                                             // A matching row exists, so update it
-                                        const updateSql = `UPDATE stocks SET packquantity = packquantity + ${packquantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
+                                        const updateSql = `UPDATE stocks SET quantity = quantity + ${quantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
                                         connection.query(updateSql, function(err, updateResult, fields) {
                                             if (err) {
                                                 res.send(err);
                                             } else {
-                                                // delete the row if the required columns are equal to an existing row and add the packquantity to that existing row
+                                                // delete the row if the required columns are equal to an existing row and add the quantity to that existing row
                                                 const deleteQuery = `DELETE FROM stocks WHERE productid = ${id}`;
                                                 connection.query(deleteQuery, function (err, deleteResult, fields) {
                                                     if (err) {
@@ -259,8 +257,8 @@ router.post("/editstocks/:productid", (req, res) => {
                                             }
                                         });
                                         } else {
-                                            const updateQuery = "UPDATE stocks SET productcode = ?, description = ?, category = ?, packquantity = ?, packsize = ?, reorderlevel = ?, manufacturer = ?, cost = ?, form = ?, price = ?, expiration_date = ?, lotnumber = ?, branchid = ? WHERE productid = ?";
-                                            const updateParams = [productCode, description, category, packquantity, packsize, reOrderLevel, manufacturer, cost, form, price, expiration, lotNumber, branchID, id];
+                                            const updateQuery = "UPDATE stocks SET productcode = ?, description = ?, category = ?, quantity = ?, reorderlevel = ?, manufacturer = ?, cost = ?, form = ?, price = ?, expiration_date = ?, lotnumber = ?, branchid = ? WHERE productid = ?";
+                                            const updateParams = [productCode, description, category, quantity,  reOrderLevel, manufacturer, cost, form, price, expiration, lotNumber, branchID, id];
 
                                             // Check for empty values
                                             if (!productCode || !description || !category || !manufacturer || !form) {
@@ -277,12 +275,12 @@ router.post("/editstocks/:productid", (req, res) => {
                                                                 res.send(err);
                                                             } else if (result.length > 1) {
                                                                 // A matching row exists, so update it
-                                                                const updateSql = `UPDATE stocks SET packquantity = packquantity + ${packquantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
+                                                                const updateSql = `UPDATE stocks SET quantity = quantity + ${quantity}, reorderlevel = ${reOrderLevel}, cost = ${cost}, price = ${price} WHERE ${whereClause}`;
                                                                 connection.query(updateSql, function(err, updateResult, fields) {
                                                                     if (err) {
                                                                         res.send(err);
                                                                     } else {
-                                                                        // delete the row if the required columns are equal to an existing row and add the packquantity to that existing row
+                                                                        // delete the row if the required columns are equal to an existing row and add the quantity to that existing row
                                                                         const deleteQuery = `DELETE FROM stocks WHERE productid = ${id}`;
                                                                         connection.query(deleteQuery, function (err, deleteResult, fields) {
                                                                             if (err) {

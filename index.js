@@ -31,6 +31,9 @@ app.use("/agents", agentRouter);
 //user route
 const userRouter = require("./routes/users");
 app.use("/manageuser", userRouter);
+//invoice route
+const invoiceRouter = require("./routes/invoice");
+app.use("/invoice", invoiceRouter);
 
 //Port
 app.listen(3001, () => {

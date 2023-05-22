@@ -5,9 +5,7 @@ const router = express.Router();
 router.post("/insertagents", (req, res) => {
     const {
       agentcode: agentcode,
-      a_firstname: firstName,
-      a_middlename: middleName,
-      a_lastname: lastName,
+      a_name: a_name,
       a_phonenum: phoneNum,
       a_quota: quota,
       areacode: areacode,
@@ -24,8 +22,8 @@ router.post("/insertagents", (req, res) => {
         res.send("Agent code already exist for an existing agent");
       } else {
         const insertQuery = `INSERT INTO agents 
-          (agentcode, a_firstname, a_middlename, a_lastname, a_phonenum, a_quota,areacode, areaname, branchid)
-          VALUES (${agentcode}, "${firstName}", "${middleName}", "${lastName}", "${phoneNum}", ${quota}, "${areacode}", "${areaname}", ${branchID})`;
+          (agentcode, a_name, a_phonenum, a_quota,areacode, areaname, branchid)
+          VALUES (${agentcode}, "${a_name}", "${phoneNum}", ${quota}, "${areacode}", "${areaname}", ${branchID})`;
   
         connection.query(insertQuery, (err, result, fields) => {
           if (err) {
@@ -74,9 +72,7 @@ router.get("/viewagents/", (req,res) => {
 router.post("/editagents/:agentid", (req, res) => {
     const {
       agentcode: agentcode,
-      a_firstname: firstName,
-      a_middlename: middleName,
-      a_lastname: lastName,
+      a_name: a_name,
       a_phonenum: phoneNum,
       a_quota: quota,
       areacode: areacode,
@@ -95,7 +91,7 @@ router.post("/editagents/:agentid", (req, res) => {
         res.send("Agent code already exist for an existing agent");
       } else {
         const updateQuery = `UPDATE agents SET
-        agentcode = ${agentcode}, a_firstname = "${firstName}", a_middlename = "${middleName}", a_lastname = "${lastName}", a_phonenum = "${phoneNum}",
+        agentcode = ${agentcode}, a_name = "${a_name}", a_phonenum = "${phoneNum}",
         a_quota = ${quota}, areacode = "${areacode}", areaname = "${areaname}", branchid = ${branchID} WHERE agentid = ${id}`;
 
         connection.query(updateQuery, (err, result, fields) => {
