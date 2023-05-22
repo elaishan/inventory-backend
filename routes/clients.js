@@ -2,32 +2,45 @@ const connection = require("../dbconnection");
 const express = require("express");
 const router = express.Router();
 
-// INSERT
 router.post("/insertclients", (req, res) => {
-  const { clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms } = req.body;
+  const { clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid } = req.body;
 
-  const selectSql = `SELECT clientcode FROM clients WHERE clientcode = '${clientcode}'`;
+  const selectAgentSql = `SELECT agentcode FROM agents WHERE agentcode = ${agentcode}`;
 
-  // Query to check if client already exists
-  connection.query(selectSql, function (err, result, fields) {
+  // Query to check if agent code exists in agents table
+  connection.query(selectAgentSql, function (err, agentResult, fields) {
     if (err) {
       // Return error message to client
       res.send(err);
-    } else if (result.length > 0) {
-      // Return error message to client if client already exists
-      res.send(`Client code is already existing.`);
+    } else if (agentResult.length === 0) {
+      // Return error message to client if agent code does not exist
+      res.send(`Agent code does not exist.`);
     } else {
-      // Query to insert new client into table "clients"
-      const insertSql = `INSERT INTO clients (clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms) 
-                          VALUES ("${clientcode}", "${name}", ${phonenumber},"${areacode}", "${areaname}", ${agentcode}, ${creditlimit}, ${terms})`;
 
-      connection.query(insertSql, function (err, result, fields) {
+      const selectClientSql = `SELECT clientcode FROM clients WHERE clientcode = '${clientcode}'`;
+
+      // Query to check if client already exists
+      connection.query(selectClientSql, function (err, clientResult, fields) {
         if (err) {
           // Return error message to client
           res.send(err);
+        } else if (clientResult.length > 0) {
+          // Return error message to client if client already exists
+          res.send(`Client code already exist for an existing client.`);
         } else {
-          // Return success message to client
-          res.send("Successfully inserted.");
+          // Query to insert new client into table "clients"
+          const insertSql = `INSERT INTO clients (clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid) 
+                              VALUES ("${clientcode}", "${name}", ${phonenumber},"${areacode}", "${areaname}", ${agentcode}, ${creditlimit}, ${terms}, ${branchid})`;
+
+          connection.query(insertSql, function (err, result, fields) {
+            if (err) {
+              // Return error message to client
+              res.send(err);
+            } else {
+              // Return success message to client
+              res.send("Successfully inserted.");
+            }
+          });
         }
       });
     }
@@ -66,24 +79,23 @@ router.get("/viewclients/", (req,res) => {
 /*========================================================================================================================*/
 
 //UPDATE
-router.post("/editclients/:clientid", (req, res) => {
-  const { clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms } = req.body;
+router.put("/editclients/:clientid", (req, res) => {
+  const { clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid } = req.body;
   const id = req.params.clientid;
-
-  const selectSql = `SELECT * FROM clients WHERE clientcode = '${clientcode}'`;
+  const selectSql = `SELECT * FROM clients WHERE clientcode = '${clientcode}' AND clientid != '${id}'`;
 
   // Query to check if client already exists
   connection.query(selectSql, function (err, result, fields) {
     if (err) {
       // Return error message to client
       res.send(err);
-    } else if (result.length > 0 && result[0].clientid !== id) {
+    } else if (result.length > 0) {
       // Return error message to client if client already exists
-      res.send(`Client code is already existing.`);
+      res.send("Client code is already existing.");
     } else {
       // Query to update the client in table "clients"
       const updateSql = `UPDATE clients SET clientcode = ${clientcode}, name = "${name}", phonenumber = "${phonenumber}", areacode = "${areacode}", areaname = "${areaname}",
-      agentcode = ${agentcode}, creditlimit = ${creditlimit},  terms = ${terms} WHERE clientid = ${id}`;
+      agentcode = ${agentcode}, creditlimit = ${creditlimit},  terms = ${terms} branchid = ${branchid} WHERE clientid = ${id}`;
 
       connection.query(updateSql, function (err, result, fields) {
         if (err) {
@@ -91,12 +103,13 @@ router.post("/editclients/:clientid", (req, res) => {
           res.send(err);
         } else {
           // Return success message to client
-          res.send("Client Successfully updated.");
+          res.send("Client updated successfully.");
         }
       });
     }
   });
 });
+
 
 
 /*========================================================================================================================*/
