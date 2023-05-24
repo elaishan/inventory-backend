@@ -87,60 +87,86 @@ router.get("/viewclients/", (req,res) => {
 
 //UPDATE
 router.put("/editclients/:clientid", (req, res) => {
+  
   const { clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid } = req.body;
   const id = req.params.clientid;
 
   const selectSql = `SELECT * FROM clients WHERE clientcode = ? AND clientid != ?`;
-  const selectParams = [clientcode, id];
+  const selectParams = [clientcode, id]; 
 
   // Query to check if client already exists
-  connection.query(selectSql, selectParams, function (err, result, fields) {
+  connection.query(selectSql, selectParams, function (err, clientResult, fields) {
     if (err) {
       // Return error message to client
       res.send(err);
-    } else if (result.length > 0) {
-      // Return error message to client if client already exists
-      res.send({ message: "Client code is already existing." });
     } else {
-      // Query to update the client in table "clients"
-      const updateSql = `UPDATE clients SET clientcode = ?, name = ?, phonenumber = ?, areacode = ?, areaname = ?, agentcode = ?, creditlimit = ?, terms = ?, branchid = ? WHERE clientid = ?`;
-      const updateParams = [clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid, id];
-
-      connection.query(updateSql, updateParams, function (err, result, fields) {
+        const selectAgentSql = `SELECT agentcode FROM agents WHERE agentcode = '${agentcode}'`;
+        // Query to check if agent code exists in agents table
+        connection.query(selectAgentSql, function (err, agentResult, fields) {
         if (err) {
-          // Return error message to client
-          res.send(err);
+        // Return error message to client
+        res.send(err);
         } else {
-          // Return success message to client
-          res.send({ success: "Client updated successfully." });
+            const selectClientSql = `SELECT clientcode FROM clients WHERE clientcode = '${clientcode}'`;
+
+            // Query to check if client already exists
+            connection.query(selectClientSql, function (err, clientResult, fields) {
+            if (err) {
+            // Return error message to client
+            res.send(err);
+            } else if (agentResult.length === 0 && clientResult.length > 0) {
+            // Return error message to client if client already exists and Agent Code doesn't exist
+            res.send({ message: "Client Code already exists and Agent Code doesn't exist in the Database." });
+            } else if (agentResult.length === 0) {
+            // Return error message to client if agent code does not exist
+            res.send({ message: "Agent code does not exist." });
+            } else if (clientResult.length > 0) {
+            // Return error message to client if client already exists
+            res.send({ message: "Client code already exists for an existing client." });
+            } else {
+                // Query to update the client in table "clients"
+                const updateSql = `UPDATE clients SET clientcode = ?, name = ?, phonenumber = ?, areacode = ?, areaname = ?, agentcode = ?, creditlimit = ?, terms = ?, branchid = ? WHERE clientid = ?`;
+                const updateParams = [clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid, id];
+
+                connection.query(updateSql, updateParams, function (err, result, fields) {
+                if (err) {
+                // Return error message to client
+                res.send(err);
+                } else {
+                // Return success message to client
+                res.send({ success: "Client updated successfully." });
+                }
+                });
+            }
+          });
         }
-      });
+      });  
     }
-  });
+  });  
 });
-
-
 
 
 /*========================================================================================================================*/
 
 //DELETE
-router.delete("/deleteclients/:id", (req,res) => {
-    const id = req.params.id
+router.delete("/deleteclients/:id", (req, res) => {
+  const id = req.params.id;
 
-     //query for deleting
-     connection.query(`DELETE FROM clients WHERE clientid = ` + id, function(error,result, fields){
-      if(error){
-          console.log("error:" + error)
+  // query for deleting
+  connection.query("DELETE FROM clients WHERE clientid = " + id, function (error, result, fields) {
+    if (error) {
+      console.log("error:" + error);
+      res.status(500).send("Error deleting client");
+    } else {
+      if (result.affectedRows === 0) {
+        res.status(404).send("Client not found");
+      } else {
+        res.send("Successfully deleted");
       }
-      if(result){
-          if(result.affectedRows == 0){ //checks if the inputted id is existing in database
-              res.send("client does not exist")
-          }else{
-              res.send("successfully deleted")
-          }
-      }
-  })
+    }
+  });
 });
+
+
 
 module.exports = router;
