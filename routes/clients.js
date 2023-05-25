@@ -95,7 +95,7 @@ router.put("/editclients/:clientid", (req, res) => {
   const selectParams = [clientcode, id]; 
 
   // Query to check if client already exists
-  connection.query(selectSql, selectParams, function (err, clientResult, fields) {
+  connection.query(selectSql, selectParams, function (err, result, fields) {
     if (err) {
       // Return error message to client
       res.send(err);
@@ -120,7 +120,7 @@ router.put("/editclients/:clientid", (req, res) => {
             } else if (agentResult.length === 0) {
             // Return error message to client if agent code does not exist
             res.send({ message: "Agent code does not exist." });
-            } else if (clientResult.length > 0) {
+            } else if (result.length > 0 ) {
             // Return error message to client if client already exists
             res.send({ message: "Client code already exists for an existing client." });
             } else {
@@ -144,6 +144,39 @@ router.put("/editclients/:clientid", (req, res) => {
     }
   });  
 });
+
+// router.put("/editclients/:clientid", (req, res) => {
+//   const { clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid } = req.body;
+//   const id = req.params.clientid;
+
+//   const selectSql = `SELECT * FROM clients WHERE clientcode = ? AND clientid != ?`;
+//   const selectParams = [clientcode, id];
+
+//   // Query to check if client already exists
+//   connection.query(selectSql, selectParams, function (err, result, fields) {
+//     if (err) {
+//       // Return error message to client
+//       res.send(err);
+//     } else if (result.length > 0) {
+//       // Return error message to client if client already exists
+//       res.send({ message: "Client code is already existing." });
+//     } else {
+//       // Query to update the client in table "clients"
+//       const updateSql = `UPDATE clients SET clientcode = ?, name = ?, phonenumber = ?, areacode = ?, areaname = ?, agentcode = ?, creditlimit = ?, terms = ?, branchid = ? WHERE clientid = ?`;
+//       const updateParams = [clientcode, name, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid, id];
+
+//       connection.query(updateSql, updateParams, function (err, result, fields) {
+//         if (err) {
+//           // Return error message to client
+//           res.send(err);
+//         } else {
+//           // Return success message to client
+//           res.send({ success: "Client updated successfully." });
+//         }
+//       });
+//     }
+//   });
+// });
 
 
 /*========================================================================================================================*/
