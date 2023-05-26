@@ -3,40 +3,49 @@ const express = require("express");
 const router = express.Router();
 
 router.post("/insertagents", (req, res) => {
-  const {
-    agentcode: agentcode,
-    a_name: a_name,
-    a_phonenum: phoneNum,
-    a_quota: quota,
-    areacode: areaCode,
-    areaname: areaName,
-    branchid: branchID
-  } = req.body;
+  const agentcode = req.body.agentcode;
+  const a_Name = req.body.a_name;
+  const a_phoneNum = req.body.a_phonenum;
+  const a_Quota = req.body.a_quota;
+  const areaCode = req.body.areacode;
+  const areaName = req.body.areaname;
+  const branchID = req.body.branchid;
 
-  const checkQuery = `SELECT * FROM agents WHERE agentcode = ${agentcode}`;
+  const checkQuery = "SELECT COUNT(*) AS count FROM agents WHERE agentcode = ?";
 
-  connection.query(checkQuery, (err, result, fields) => {
+  connection.query(checkQuery, [agentcode], function (err, result, fields) {
     if (err) {
-      res.send(err);
-    } else if (result.length > 0) {
-      res.send("Agent code already exists for an existing agent"); // Existing agent code error message
+      res.status(500).send(err);
     } else {
-      const insertQuery = `INSERT INTO agents 
-        (agentcode, a_name, a_phonenum, a_quota,areacode, areaname, branchid)
-        VALUES (${agentcode}, "${a_name}", "${phoneNum}", ${quota}, "${areaCode}", "${areaName}", ${branchID})`;
+      if (result[0].count === 0) {
+        const insertQuery =
+          "INSERT INTO agents (agentcode, a_name, a_phonenum, a_quota, areacode, areaname, branchid) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-      connection.query(insertQuery, (err, result, fields) => {
-        if (err) {
-          res.send(err);
-        } else {
-          res.send("Agent successfully inserted.");
-        }
-      });
+        connection.query(
+          insertQuery,
+          [
+            agentcode,
+            a_Name,
+            a_phoneNum,
+            a_Quota,
+            areaCode,
+            areaName,
+            branchID,
+          ],
+          function (err, result, fields) {
+            if (err) {
+              res.status(500).send(err);
+            } else {
+              res.send({success: "Agent successfully added"});
+            }
+          }
+        );
+      } else {
+        res.status(409).send({message: "Agent code for another agent already exists"});
+      }
     }
   });
 });
-  
-  
 
 /*========================================================================================================================*/
 
@@ -88,7 +97,7 @@ router.post("/editagents/:agentid", (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else if (result.length > 0) {
-      res.status(400).send("Agent code already exists for another agent.");
+      res.status(400).send("Agent code already exists for another agent!");
     } else {
       const updateQuery = `UPDATE agents SET
         agentcode = ${agentCode}, a_name = "${agentName}", a_phonenum = "${phoneNum}", a_quota = "${quota}", areacode = "${areaCode}", areaname = "${areaName}", branchid = "${branchID}" WHERE agentid = ${id}`;
@@ -97,7 +106,7 @@ router.post("/editagents/:agentid", (req, res) => {
         if (err) {
           res.status(500).send(err);
         } else {
-          res.send("Agent successfully updated.");
+          res.send({success:"Agent successfully updated."});
         }
       });
     }
