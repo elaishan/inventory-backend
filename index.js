@@ -34,6 +34,9 @@ app.use("/manageuser", userRouter);
 //invoice route
 const invoiceRouter = require("./routes/invoice");
 app.use("/invoice", invoiceRouter);
+//soa route
+const paymentRouter = require("./routes/payment");
+app.use("/payment", paymentRouter);
 
 //Port
 app.listen(3001, () => {
