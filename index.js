@@ -38,6 +38,10 @@ app.use("/invoice", invoiceRouter);
 const paymentRouter = require("./routes/payment");
 app.use("/payment", paymentRouter);
 
+//dashboard route
+const dashboardRouter = require("./routes/dashboard");
+app.use("/dashboard", dashboardRouter);
+
 //Port
 app.listen(3001, () => {
     console.log("server is running");
