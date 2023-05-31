@@ -87,8 +87,7 @@ router.put("/edituser/:id", (req, res) => {
 
   // Check if id is valid
   if (!id) {
-    res.status(400).send("Invalid user ID.");
-    return;
+    return res.status(400).send("Invalid user ID.");
   }
 
   // Check for duplicate username
@@ -96,25 +95,23 @@ router.put("/edituser/:id", (req, res) => {
   connection.query(sqlCheckDuplicate, [username, id], (err, result) => {
     if (err) {
       console.log(err);
-      res.status(500).send("Error updating user.");
-      return;
+      return res.status(500).send("Error updating user.");
     }
     const count = result[0].count;
     if (count > 0) {
-      res.status(409).send("Username is already taken or already used.");
-      return;
+      return res.status(409).send("Username is already taken or already used.");
     }
+
     // Update user
     const sqlUpdate = "UPDATE users SET username = ?, password = ?, fname = ?, mname = ?, lname = ?, userprivilege = ?, branchid = ? WHERE userid = ?";
     connection.query(sqlUpdate, [username, password, fname, mname, lname, userprivilege, branchid, id], (err, result) => {
       if (err) {
         console.log(err);
-        res.status(500).send("Error updating user.");
+        return res.status(500).send("Error updating user.");
       } else if (result.affectedRows === 0) {
-        res.status(404).send("User does not exist.");
-      } else {
-        res.status(200).send("User updated successfully.");
+        return res.status(404).send("User does not exist.");
       }
+      return res.status(200).send("User updated successfully.");
     });
   });
 });
