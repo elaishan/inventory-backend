@@ -103,7 +103,7 @@ router.post("/insertinvoice", (req, res) => {
   // Inserting invoice
   const {
     invoicecode = parseInt(req.body.invoicecode), invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, agentcode,
-    netamount, discount, totalamount
+    netamount, discount, totalamount, modeofpayment
   } = req.body;
   
   // Validate if the client exists in the client table
@@ -259,7 +259,7 @@ router.post("/insertinvoice", (req, res) => {
                 });
             }
             else if (invoice_type === 'backorder') {
-              console.log("backorder") //possibly gawing else and insert lang sa invoice_master/details walang effect sa ibang table
+              console.log("backorder")
             } 
             else {
               for (let i = 0; i < productResult.length; i++) {
@@ -325,8 +325,8 @@ router.post("/insertinvoice", (req, res) => {
                       // Insert into invoice_master table
                       const invoiceMasterQuery = `INSERT INTO invoice_master (
                         invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                        areaname, agentcode, a_name, netamount, discount, totalamount ) VALUES 
-                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount})`;
+                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment ) VALUES 
+                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, '${modeofpayment}')`;
                       // Insert into invoice_details table
                       // (assuming the details are provided in the request body)
 
@@ -374,8 +374,8 @@ router.post("/insertinvoice", (req, res) => {
                       // Insert into invoice_master table
                       const invoiceMasterQuery = `INSERT INTO invoice_master (
                         invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                        areaname, agentcode, a_name, netamount, discount, totalamount) VALUES 
-                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount})`;
+                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment) VALUES 
+                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}")`;
                       // Insert into invoice_details table
                       // (assuming the details are provided in the request body)
 
@@ -413,8 +413,8 @@ router.post("/insertinvoice", (req, res) => {
                   // Insert into invoice_master table
                   const invoiceMasterQuery = `INSERT INTO invoice_master (
                     invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                    areaname, agentcode, a_name, netamount, discount, totalamount) VALUES 
-                    (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount})`;
+                    areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment) VALUES 
+                    (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}")`;
                   // Insert into invoice_details table
                   // (assuming the details are provided in the request body)
 

@@ -34,10 +34,12 @@ app.use("/manageuser", userRouter);
 //invoice route
 const invoiceRouter = require("./routes/invoice");
 app.use("/invoice", invoiceRouter);
-//soa route
+//payment route
 const paymentRouter = require("./routes/payment");
 app.use("/payment", paymentRouter);
-
+//memo route
+const memoRouter = require("./routes/memo");
+app.use("/memo", memoRouter);
 //dashboard route
 const dashboardRouter = require("./routes/dashboard");
 app.use("/dashboard", dashboardRouter);
