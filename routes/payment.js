@@ -27,6 +27,20 @@ router.get("/clients/:clientcode", (req,res) => {
   })
 });
 
+router.get("/soa/:clientcode", (req,res) => {
+  const clientcode = req.params.clientcode
+  //fetch data of selected the client from the clients table
+  const selectClient = `SELECT * FROM statement_of_account WHERE clientcode = ${clientcode} ORDER BY soa_id ASC`;
+  connection.query(selectClient, (err, result) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(result);
+    }
+  })
+});
+
+
 router.post("/insert-payment", (req, res) => {
   const { clientcode, name } = req.body;
   const selectClient = `SELECT runningbalance FROM statement_of_account WHERE clientcode = ${clientcode} AND name = '${name}' ORDER BY soa_id DESC LIMIT 1`;
