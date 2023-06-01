@@ -99,7 +99,7 @@ router.put("/edituser/:id", (req, res) => {
     }
     const count = result[0].count;
     if (count > 0) {
-      return res.status(409).send("Username is already taken or already used.");
+      return res.status(409).send({ message: "Username is already taken." });
     }
 
     // Update user
@@ -111,10 +111,11 @@ router.put("/edituser/:id", (req, res) => {
       } else if (result.affectedRows === 0) {
         return res.status(404).send("User does not exist.");
       }
-      return res.status(200).send("User updated successfully.");
+      return res.status(200).send({ success: "User updated successfully." });
     });
   });
 });
+
 
 /*========================================================================================================================*/
 
@@ -126,12 +127,12 @@ router.delete("/deleteuser/:id", (req, res) => {
     connection.query("DELETE FROM users WHERE userid = " + id, function (error, result, fields) {
       if (error) {
         console.log("error:" + error);
-        res.status(500).send("Error deleting user");
+        res.status(500).send({ message: "Error deleting user"});
       } else {
         if (result.affectedRows == 0) {
           res.status(404).send("User not found");
         } else {
-          res.send("Successfully deleted");
+          res.send({success: "Successfully deleted"});
         }
       }
     });
