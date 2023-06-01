@@ -4,7 +4,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const SECRET_KEY = process.env.SECRET_KEY;
-
+const verifyToken = require("../middleware/verifyToken");
 
 router.post('/', (req, res) => {
   const username = req.body.username;
@@ -18,7 +18,6 @@ router.post('/', (req, res) => {
         res.status(500).json({ error: 'An error occurred during login' });
       } else {
         if (result.length > 0) {
-
           // Generate a JWT token
           const token = jwt.sign({ username, password }, SECRET_KEY, { expiresIn: '1h' });
 
@@ -29,6 +28,11 @@ router.post('/', (req, res) => {
       }
     }
   );
+});
+
+router.get('/protected', verifyToken, (req, res) => {
+  // Access user information from `req.user`
+  // Handle the protected route logic
 });
 
 module.exports = router;
