@@ -40,6 +40,9 @@ app.use("/payment", paymentRouter);
 //memo route
 const memoRouter = require("./routes/memo");
 app.use("/memo", memoRouter);
+//delivery route
+const deliveryRouter = require("./routes/delivery");
+app.use("/delivery", deliveryRouter);
 //dashboard route
 const dashboardRouter = require("./routes/dashboard");
 app.use("/dashboard", dashboardRouter);
