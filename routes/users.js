@@ -1,7 +1,9 @@
 const connection = require("../dbconnection");
 const express = require("express");
 const router = express.Router();
+const bcrypt = require('bcrypt');
 
+const saltRound = 1;
 
 //INSERT
 router.post("/insertuser", (req, res) => {
@@ -20,28 +22,22 @@ router.post("/insertuser", (req, res) => {
         res.status(500).send(err);
       } else {
         if (result[0].count === 0) {
-          const insertQuery =
-            "INSERT INTO users (username, password, fname, mname, lname, userprivilege, branchid) VALUES (?, ?, ?, ?, ?, ?, ?)";
-  
-          connection.query(
-            insertQuery,
-            [
-              username,
-              password,
-              firstName,
-              middleName,
-              lastName,
-              userPrivilege,
-              branchID,
-            ],
-            function (err, result, fields) {
+            bcrypt.hash(password,saltRound, (err, hash) => {
               if (err) {
-                res.status(500).send(err);
-              } else {
-                res.send({success: "User successfully inserted"});
-              }
-            }
-          );
+                       console.log(err)
+                   }
+                   connection.query( 
+                       "INSERT INTO users (username, password, fname, mname, lname, userprivilege, branchid) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       [username, hash, firstName, middleName, lastName, userPrivilege, branchID], 
+                       function (err, result, fields) {
+                        if (err) {
+                          res.status(500).send(err);
+                        } else {
+                          res.send({success: "User successfully inserted"});
+                        }
+                      }
+                   );
+               })
         } else {
           res.status(409).send({message: "User already exists"});
         }
