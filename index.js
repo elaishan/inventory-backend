@@ -45,7 +45,7 @@ const deliveryRouter = require("./routes/delivery");
 app.use("/delivery", deliveryRouter);
 //dashboard route
 const dashboardRouter = require("./routes/dashboard");
-app.use("/dashboard", dashboardRouter);
+app.use("/", dashboardRouter);
 
 //Port
 app.listen(3001, () => {
