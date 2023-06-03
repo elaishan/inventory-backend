@@ -48,7 +48,7 @@ const rsnRouter = require("./routes/rsn");
 app.use("/rsn", rsnRouter);
 //dashboard route
 const dashboardRouter = require("./routes/dashboard");
-app.use("/dashboard", dashboardRouter);
+app.use("/", dashboardRouter);
 
 //Port
 app.listen(3001, () => {
