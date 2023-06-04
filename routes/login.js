@@ -16,6 +16,7 @@ router.post('/', (req, res) => {
       console.error('Error fetching user:', error);
       return;
     } else if (results.length === 0) {
+      res.send({ message: 'User not found.' });
       console.log('User not found.');
       return;
     } else {
