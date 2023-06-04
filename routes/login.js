@@ -24,7 +24,7 @@ router.post('/', (req, res) => {
 
       bcrypt.compare(password, hashedPassword, (compareError, isMatch) => {
         if (compareError) {
-          console.error('Error comparing passwords:', compareError);
+          res.status(500).json({ error: 'An error occurred during login' });
           return;
         }
 
@@ -34,7 +34,7 @@ router.post('/', (req, res) => {
           res.json({ token });
           // Proceed with further actions for authenticated users
         } else {
-          console.log('Authentication Failed!');
+          res.status(500).json({ error: 'An error occurred during login' });
           // Handle incorrect password scenario
         }
       });
@@ -43,7 +43,7 @@ router.post('/', (req, res) => {
 });
 
 router.get('/protected', verifyToken, (req, res) => {
-  // Access user information from `req.user`
+  // Access user information from req.user
   // Handle the protected route logic
 });
 
