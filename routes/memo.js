@@ -57,10 +57,10 @@ router.post("/insert-memo", (req, res) => {
       if(memotype === "credit"){ // <- nadagdag
         const parsedTotalAmount = parseFloat(totalamount);
         if (parsedTotalAmount > runningbalance) {
-          res.send("The total amount exceeds the balance amount!");
+          res.send({ message: "The total amount exceeds the balance amount!"});
         } 
         else if (parsedTotalAmount === 0) {
-          res.send("Cannot be 0");
+          res.send({ message: "Cannot be 0"});
         } 
         else if (parsedTotalAmount <= runningbalance) {
           const debit = null;
@@ -121,7 +121,7 @@ router.post("/insert-memo", (req, res) => {
         });
       }
       else {
-        res.send("Invalid total amount");
+        res.send({ message: "Invalid total amount"});
       }
     }
   });
