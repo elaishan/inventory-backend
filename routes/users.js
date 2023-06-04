@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
-const saltRound = 1;
+const saltRound = 10;
 
 //INSERT
 router.post("/insertuser", (req, res) => {
