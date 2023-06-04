@@ -111,7 +111,7 @@ router.post("/insertinvoice", (req, res) => {
   connection.query(clientQuery, (error, clientResults) => {
     if (error) {
       console.error("Error retrieving client data:", error);
-      return res.send({ message: "Error retrieving client data:", error});
+      return res.send("Error retrieving client data:", error);
     }
 
     if (clientResults.length === 0) {
@@ -125,7 +125,7 @@ router.post("/insertinvoice", (req, res) => {
     connection.query(agentQuery, (error, agentResults) => {
       if (error) {
         console.error("Error retrieving agent data:", error);
-        return res.send({ message: "Internal Server Error"});
+        return res.send("Internal Server Error");
       }
   
       if (agentResults.length === 0) {
@@ -142,7 +142,7 @@ router.post("/insertinvoice", (req, res) => {
       connection.query(agentBranchQuery, (error, agentBranchResult) => {
         if (error) {
           console.error("Error querying agents table:", error);
-          return res.send({ message: "Internal Server Error"});
+          return res.send("Internal Server Error");
         }
 
         if (agentBranchResult.length === 0) {
@@ -156,7 +156,7 @@ router.post("/insertinvoice", (req, res) => {
         connection.query(productQuery, (error, productResult) => {
           if (error) {
             console.error("Error querying stocks table:", error);
-            return res.send({ message: "Internal Server Error"});
+            return res.send("Internal Server Error");
           }
 
           if (productResult.length === 0) {
@@ -180,7 +180,7 @@ router.post("/insertinvoice", (req, res) => {
                 connection.query(rQuery, (error, rResult) => {
                   if (error) {
                     console.error("Error querying statement of account table:", error);
-                    return res.send({ message: "Internal Server Error"});
+                    return res.send("Internal Server Error");
                   } 
                   else if (rResult.length === 0) {
                    return res.send({ message: 'Client Did Not Order The Product!'});
@@ -225,7 +225,7 @@ router.post("/insertinvoice", (req, res) => {
                     connection.query(returnQuery, (error, soaResult) => {
                       if (error) {
                         console.error("Error querying statement of account table:", error);
-                        return res.send({ message: "Internal Server Error"});
+                        return res.send("Internal Server Error");
                       } 
                       else {
                         const { clientcode, name, productcode, totalamount, debit } = req.body;
@@ -246,7 +246,7 @@ router.post("/insertinvoice", (req, res) => {
                         connection.query(newDebitQuery, (error, result) => {
                           if (error) {
                             console.error("Error inserting statement of account:", error);
-                            return res.send({ message: "Internal Server Error"});
+                            return res.send("Internal Server Error");
                           } else {
                             console.log(result);
                             // Statement of Account successfully inserted
@@ -304,7 +304,7 @@ router.post("/insertinvoice", (req, res) => {
               connection.query(deleteQuery, (error, deleteResult) => {
                 if (error) {
                   console.error("Error deleting rows from stocks table:", error);
-                  return res.send({ messgae: "Internal Server Error"});
+                  return res.send("Internal Server Error");
                 }
 
                 if (deleteResult.affectedRows > 0) {
@@ -316,7 +316,7 @@ router.post("/insertinvoice", (req, res) => {
                   connection.query(boQuery, (error, boResult) => {
                     if (error) {
                       console.error("Error querying statement of account table:", error);
-                      return res.send({ message: "Internal Server Error"});
+                      return res.send("Internal Server Error");
                     } 
                     else if (boResult.length === 0) {
                       res.send({ message: 'No Record Found!'});
@@ -334,7 +334,7 @@ router.post("/insertinvoice", (req, res) => {
                       connection.query(invoiceMasterQuery, (error, masterResults) => {
                         if (error) {
                           console.error("Error inserting into invoice_master table:", error);
-                          return res.send({ message: "Internal Server Error"});
+                          return res.send("Internal Server Error");
                         }
                         console.log("invoice master successfully inserted!");
 
@@ -346,15 +346,16 @@ router.post("/insertinvoice", (req, res) => {
                       connection.query(invoiceDetailsQuery, (error, detailsResults) => {
                         if (error) {
                           console.error("Error inserting into invoice_details table:", error);
-                          return res.send({ message: "Internal Server Error"});
+                          return res.send("Internal Server Error");
                         } else {
-                         return res.send({ success: "Invoice details successfully inserted!"});
+                          console.log("Invoice details successfully inserted!");
                         }
+
                         if (detailsResults.affectedRows === 0) {
-                          return res.send({ message: "Failed to insert data into invoice_details table"});
+                          return res.send({message:"Failed to insert data into invoice_details table"});
                         }
                         // Return success response
-                        return res.send({ success: "Invoice details successfully processed"});
+                        return res.send({success:"Invoice details successfully processed"});
                       });
                     }
                   });
@@ -364,7 +365,7 @@ router.post("/insertinvoice", (req, res) => {
                   connection.query(rnQuery, (error, rnResult) => {
                     if (error) {
                       console.error("Error querying statement of account table:", error);
-                      return res.send({ message: "Internal Server Error"});
+                      return res.send("Internal Server Error");
                     } 
                     else if (rnResult.length === 0) {
                       console.log('No Record Found!');
@@ -382,7 +383,7 @@ router.post("/insertinvoice", (req, res) => {
                       connection.query(invoiceMasterQuery, (error, masterResults) => {
                         if (error) {
                           console.error("Error inserting into invoice_master table:", error);
-                          return res.send({ message: "Internal Server Error"});
+                          return res.send("Internal Server Error");
                         }
                         console.log("invoice master successfully inserted!");
 
@@ -394,9 +395,9 @@ router.post("/insertinvoice", (req, res) => {
                       connection.query(invoiceDetailsQuery, (error, detailsResults) => {
                         if (error) {
                           console.error("Error inserting into invoice_details table:", error);
-                          return res.send({ message: "Internal Server Error"});
+                          return res.send("Internal Server Error");
                         } else {
-                          res.send({ success: "Invoice details successfully inserted!"});
+                          res.send("Invoice details successfully inserted!");
                         }
 
                         if (detailsResults.affectedRows === 0) {
@@ -421,7 +422,7 @@ router.post("/insertinvoice", (req, res) => {
                   connection.query(invoiceMasterQuery, (error, masterResults) => {
                     if (error) {
                       console.error("Error inserting into invoice_master table:", error);
-                      return res.send({ message: "Internal Server Error"});
+                      return res.send("Internal Server Error");
                     }
                     console.log("invoice master successfully inserted!");
 
@@ -433,7 +434,7 @@ router.post("/insertinvoice", (req, res) => {
                   connection.query(invoiceDetailsQuery, (error, detailsResults) => {
                     if (error) {
                       console.error("Error inserting into invoice_details table:", error);
-                      return res.send({ message: "Internal Server Error"});
+                      return res.send("Internal Server Error");
                     } else {
                       console.log("Invoice details successfully inserted!");
                     }
@@ -447,7 +448,7 @@ router.post("/insertinvoice", (req, res) => {
                       connection.query(returnQuery, (error, soaResult) => {
                         if (error) {
                           console.error("Error querying statement of account table:", error);
-                          return res.send({ message: "Internal Server Error"});
+                          return res.send("Internal Server Error");
                         } else {
                           const { clientcode, name, invoicecode, invoice_date, totalamount, runningbalance } = req.body;
                           const debit = totalamount;
@@ -463,12 +464,12 @@ router.post("/insertinvoice", (req, res) => {
                                 res.send(error);
                               } else {
                                 console.log(result);
-                                res.send({ success: "Statement of Account inserted successfully."});
+                                res.send("Statement of Account inserted successfully.");
                               }
                             });
                           }
                           else if (runningbalance === 0) {
-                            console.log("No running balance! Nothing to be credited!");
+                            res.send({ message:"No running balance! Nothing to be credited!"});
                           } else {
                             const runningbalance = debit;
 
@@ -480,7 +481,7 @@ router.post("/insertinvoice", (req, res) => {
                                 res.send(error);
                               } else {
                                 console.log(result);
-                                res.send({ success: "Statement of Account inserted successfully."});
+                                res.send("Statement of Account inserted successfully.");
                               }
                             });
                           }
@@ -498,7 +499,7 @@ router.post("/insertinvoice", (req, res) => {
             })
           .catch((error) => {
             console.error("Error updating stocks table:", error);
-            return res.send({ message: "Internal Server Error"});
+            return res.send("Internal Server Error");
           });
         });
       });               
