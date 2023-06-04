@@ -24,7 +24,7 @@ router.post('/', (req, res) => {
 
       bcrypt.compare(password, hashedPassword, (compareError, isMatch) => {
         if (compareError) {
-          res.status(500).json({ error: 'An error occurred during login' });
+          console.error('Error comparing passwords:', compareError);
           return;
         }
 
@@ -34,7 +34,7 @@ router.post('/', (req, res) => {
           res.json({ token });
           // Proceed with further actions for authenticated users
         } else {
-          res.status(500).json({ error: 'An error occurred during login' });
+          console.log('Authentication Failed!');
           // Handle incorrect password scenario
         }
       });
