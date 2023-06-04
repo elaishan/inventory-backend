@@ -97,7 +97,7 @@ router.post("/editagents/:agentid", (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else if (result.length > 0) {
-      res.status(400).send({msg:"Agent code already exists for another agent!"});
+      res.status(400).send("Agent code already exists for another agent!");
     } else {
       const updateQuery = `UPDATE agents SET
         agentcode = ${agentCode}, a_name = "${agentName}", a_phonenum = "${phoneNum}", a_quota = "${quota}", areacode = "${areaCode}", areaname = "${areaName}", branchid = "${branchID}" WHERE agentid = ${id}`;

@@ -111,11 +111,11 @@ router.post("/insertinvoice", (req, res) => {
   connection.query(clientQuery, (error, clientResults) => {
     if (error) {
       console.error("Error retrieving client data:", error);
-      return res.send("Internal Server Error");
+      return res.send("Error retrieving client data:", error);
     }
 
     if (clientResults.length === 0) {
-      return res.send("Invalid clientcode");
+      return res.send({ message: "Invalid clientcode"});
     }
 
     const { name, areaname } = clientResults[0];
@@ -129,7 +129,7 @@ router.post("/insertinvoice", (req, res) => {
       }
   
       if (agentResults.length === 0) {
-        return res.send("Invalid agentcode");
+        return res.send({ message: "Invalid agentcode"});
       }
   
       const { a_name } = agentResults[0];
@@ -146,7 +146,7 @@ router.post("/insertinvoice", (req, res) => {
         }
 
         if (agentBranchResult.length === 0) {
-          return res.send("Invalid agentid");
+          return res.send({ message: "Invalid agentid"});
         }
 
         const branchid = agentBranchResult[0].branchid;
@@ -160,7 +160,7 @@ router.post("/insertinvoice", (req, res) => {
           }
 
           if (productResult.length === 0) {
-            return res.send("There's no product available");
+            return res.send({ message: "There's no product available"});
           }
 
           let remainingQuantity = orderquantity;
@@ -183,7 +183,7 @@ router.post("/insertinvoice", (req, res) => {
                     return res.send("Internal Server Error");
                   } 
                   else if (rResult.length === 0) {
-                    console.log('Client Did Not Order The Product!');
+                   return res.send({ message: 'Client Did Not Order The Product!'});
                   }
                   else {
                     if (status === 'good stock') {
@@ -216,10 +216,10 @@ router.post("/insertinvoice", (req, res) => {
                       }
                     }
                     else if (status === 'bad stock') {
-                      console.log('Product cannot be sold again!');
+                     return res.send({ message: 'Product cannot be sold again!'});
                     }
                     else {
-                      console.log('Choose the status of the product!');
+                      return res.send({ message: 'Choose the status of the product!'});
                     }
                     const returnQuery = `SELECT debit, runningbalance FROM statement_of_account WHERE clientcode = ${clientcode} AND productcode = ${productcode} ORDER BY soa_id DESC`;
                     connection.query(returnQuery, (error, soaResult) => {
@@ -292,7 +292,7 @@ router.post("/insertinvoice", (req, res) => {
             }
           } else {
             // Handle case when orderquantity is greater than the combined total quantity
-            return res.send("Order quantity exceeds available quantity");
+            return res.send({ message: "Order quantity exceeds available quantity"});
           }
 
           Promise.all(updatePromises)
@@ -319,14 +319,14 @@ router.post("/insertinvoice", (req, res) => {
                       return res.send("Internal Server Error");
                     } 
                     else if (boResult.length === 0) {
-                      console.log('No Record Found!');
+                      res.send({ message: 'No Record Found!'});
                     }
                     else {
                       // Insert into invoice_master table
                       const invoiceMasterQuery = `INSERT INTO invoice_master (
                         invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment ) VALUES 
-                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, '${modeofpayment}')`;
+                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment, delivery_status ) VALUES 
+                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, '${modeofpayment}', "Undelivered")`;
                       // Insert into invoice_details table
                       // (assuming the details are provided in the request body)
 
@@ -352,10 +352,10 @@ router.post("/insertinvoice", (req, res) => {
                         }
 
                         if (detailsResults.affectedRows === 0) {
-                          return res.send("Failed to insert data into invoice_details table");
+                          return res.send({message:"Failed to insert data into invoice_details table"});
                         }
                         // Return success response
-                        return res.send("Invoice details successfully processed");
+                        return res.send({success:"Invoice details successfully processed"});
                       });
                     }
                   });
@@ -374,8 +374,8 @@ router.post("/insertinvoice", (req, res) => {
                       // Insert into invoice_master table
                       const invoiceMasterQuery = `INSERT INTO invoice_master (
                         invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment) VALUES 
-                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}")`;
+                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment, pullout_status) VALUES 
+                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}", "Pull out Pending")`;
                       // Insert into invoice_details table
                       // (assuming the details are provided in the request body)
 
@@ -397,14 +397,14 @@ router.post("/insertinvoice", (req, res) => {
                           console.error("Error inserting into invoice_details table:", error);
                           return res.send("Internal Server Error");
                         } else {
-                          console.log("Invoice details successfully inserted!");
+                          res.send("Invoice details successfully inserted!");
                         }
 
                         if (detailsResults.affectedRows === 0) {
-                          return res.send("Failed to insert data into invoice_details table");
+                          return res.send({ message: "Failed to insert data into invoice_details table"});
                         }
                         // Return success response
-                        return res.send("Invoice details successfully processed");
+                        return res.send({ message: "Invoice details successfully processed"});
                       });
                     }
                   });
@@ -413,8 +413,8 @@ router.post("/insertinvoice", (req, res) => {
                   // Insert into invoice_master table
                   const invoiceMasterQuery = `INSERT INTO invoice_master (
                     invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                    areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment) VALUES 
-                    (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}")`;
+                    areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment, delivery_status) VALUES 
+                    (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}", "Undelivered")`;
                   // Insert into invoice_details table
                   // (assuming the details are provided in the request body)
 
@@ -440,7 +440,7 @@ router.post("/insertinvoice", (req, res) => {
                     }
 
                     if (detailsResults.affectedRows === 0) {
-                      return res.send("Failed to insert data into invoice_details table");
+                      return res.send({ message: "Failed to insert data into invoice_details table"});
                     }
                     // Insert into statement_of_account table for chargesales or sales invoice_type
                     if (invoice_type === 'charge sales' || invoice_type === 'sales') {
@@ -469,7 +469,7 @@ router.post("/insertinvoice", (req, res) => {
                             });
                           }
                           else if (runningbalance === 0) {
-                            console.log("No running balance! Nothing to be credited!");
+                            res.send({ message:"No running balance! Nothing to be credited!"});
                           } else {
                             const runningbalance = debit;
 
@@ -491,7 +491,7 @@ router.post("/insertinvoice", (req, res) => {
                     }
                     else {
                       // Return success response
-                      return res.send("Invoice details successfully processed");
+                      return res.send({ success: "Invoice details successfully processed"});
                     }
                   });
                 }

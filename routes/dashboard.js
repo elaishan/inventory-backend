@@ -1,28 +1,59 @@
-
 const connection = require("../dbconnection");
 const express = require("express");
 const router = express.Router();
 
+router.get("/graph", (req, res) => {
+  let url = "";
+  if (req.query.invoiceid) {
+    url += "WHERE invoiceid = " + "'" + req.query.invoiceid + "'";
+  } else if (req.query.orderBy) {
+    url += "ORDER BY " + req.query.orderBy + " " + req.query.criteria;
+  }
 
-router.post("/", (req, res) => {
-  const { productcode, description } = req.body;
-  // Fetch orderquantity from the invoice_details
-  const productQuery = `SELECT orderquantity FROM invoice_details WHERE productcode = ? AND description = ?`;
-  connection.query(productQuery, [productcode, description], (error, productResult) => {
+  const productcode = req.query.productcode;
+
+  const query = `
+    SELECT invoice_details.orderquantity
+    FROM invoice_details
+    INNER JOIN invoice_master ON invoice_details.invoicecode = invoice_master.invoicecode
+    WHERE invoice_master.invoice_type IN ('sales', 'charge sales')
+      AND invoice_details.productcode = '${productcode}'  -- Add this condition to filter by productcode
+    ${url}`;
+
+  connection.query(query, function (error, result, fields) {
     if (error) {
-      console.error("Error querying invoice_details table:", error);
-      return res.status(500).send("Internal Server Error");
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.send(result);
     }
-    // Calculate the combined total quantity
-    let combinedTotalQuantity = 0;
-    for (let i = 0; i < productResult.length; i++) {
-      combinedTotalQuantity += productResult[i].orderquantity;
-    }
-    // Send the combinedTotalQuantity as the response
-    return res.status(200).json({ combinedTotalQuantity });
   });
 });
 
+router.get("/", (req, res) => {
+  let url = "";
+  if (req.query.invoiceid) {
+    url += "WHERE invoiceid = " + "'" + req.query.invoiceid + "'";
+  } else if (req.query.orderBy) {
+    url += "ORDER BY " + req.query.orderBy + " " + req.query.criteria;
+  }
 
+  const query = `
+    SELECT invoice_details.*
+    FROM invoice_details
+    INNER JOIN invoice_master ON invoice_details.invoicecode = invoice_master.invoicecode
+    WHERE invoice_master.invoice_type IN ('sales', 'charge sales')
+    ${url}
+  `;
 
-  module.exports = router;
+  connection.query(query, function (error, result, fields) {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+module.exports = router;
