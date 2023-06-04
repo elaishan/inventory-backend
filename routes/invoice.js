@@ -325,8 +325,8 @@ router.post("/insertinvoice", (req, res) => {
                       // Insert into invoice_master table
                       const invoiceMasterQuery = `INSERT INTO invoice_master (
                         invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment ) VALUES 
-                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, '${modeofpayment}')`;
+                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment, delivery_status ) VALUES 
+                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, '${modeofpayment}', "Undelivered")`;
                       // Insert into invoice_details table
                       // (assuming the details are provided in the request body)
 
@@ -374,8 +374,8 @@ router.post("/insertinvoice", (req, res) => {
                       // Insert into invoice_master table
                       const invoiceMasterQuery = `INSERT INTO invoice_master (
                         invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment) VALUES 
-                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}")`;
+                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment, pullout_status) VALUES 
+                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}", "Pull out Pending")`;
                       // Insert into invoice_details table
                       // (assuming the details are provided in the request body)
 
@@ -413,8 +413,8 @@ router.post("/insertinvoice", (req, res) => {
                   // Insert into invoice_master table
                   const invoiceMasterQuery = `INSERT INTO invoice_master (
                     invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                    areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment) VALUES 
-                    (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}")`;
+                    areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment, delivery_status) VALUES 
+                    (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}", "Undelivered")`;
                   // Insert into invoice_details table
                   // (assuming the details are provided in the request body)
 
