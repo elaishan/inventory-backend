@@ -16,6 +16,7 @@ router.post('/', (req, res) => {
       console.error('Error fetching user:', error);
       return;
     } else if (results.length === 0) {
+      res.send({ message: 'User not found.' });
       console.log('User not found.');
       return;
     } else {
@@ -43,7 +44,7 @@ router.post('/', (req, res) => {
 });
 
 router.get('/protected', verifyToken, (req, res) => {
-  // Access user information from `req.user`
+  // Access user information from req.user
   // Handle the protected route logic
 });
 
