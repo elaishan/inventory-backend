@@ -114,7 +114,7 @@ router.post("/insert-memo", (req, res) => {
               if (err) {
                 res.send(err); // Set appropriate status code and send the error message
               } else {
-                res.send(result); // Set appropriate status code and send the result
+                res.send("Memo Successfully inserted"); // Set appropriate status code and send the result
               }
             });
           }

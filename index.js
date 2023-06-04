@@ -43,6 +43,9 @@ app.use("/memo", memoRouter);
 //delivery route
 const deliveryRouter = require("./routes/delivery");
 app.use("/delivery", deliveryRouter);
+//delivery route
+const rsnRouter = require("./routes/rsn");
+app.use("/rsn", rsnRouter);
 //dashboard route
 const dashboardRouter = require("./routes/dashboard");
 app.use("/", dashboardRouter);
