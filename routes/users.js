@@ -8,7 +8,6 @@ const saltRound = 10;
 //INSERT
 router.post("/insertuser", (req, res) => {
     const username = req.body.username;
-    const password = req.body.password;
     const firstName = req.body.fname;
     const middleName = req.body.mname;
     const lastName = req.body.lname;
@@ -22,6 +21,7 @@ router.post("/insertuser", (req, res) => {
         res.status(500).send(err);
       } else {
         if (result[0].count === 0) {
+            const password = lastName
             bcrypt.hash(password,saltRound, (err, hash) => {
               if (err) {
                        console.log(err)
