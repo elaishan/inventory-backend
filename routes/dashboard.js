@@ -2,6 +2,18 @@ const connection = require("../dbconnection");
 const express = require("express");
 const router = express.Router();
 
+router.get("/viewgraph/:productcode", (req,res) => {
+  const code = req.params.productcode
+  //query for viewing
+  connection.query("SELECT * FROM invoice_details WHERE productcode = " + "\"" + code + "\"" , function(error, result, fields){
+      if(error){
+          console.error(error)
+      }else{
+          res.send(result)
+      }
+  })
+});
+
 router.get("/graph", (req, res) => {
   let url = "";
   if (req.query.invoiceid) {
@@ -17,7 +29,7 @@ router.get("/graph", (req, res) => {
     FROM invoice_details
     INNER JOIN invoice_master ON invoice_details.invoicecode = invoice_master.invoicecode
     WHERE invoice_master.invoice_type IN ('sales', 'charge sales')
-      AND invoice_details.productcode = '${productcode}'  -- Add this condition to filter by productcode
+    AND invoice_details.productcode = '${productcode}' 
     ${url}`;
 
   connection.query(query, function (error, result, fields) {
