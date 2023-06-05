@@ -183,7 +183,7 @@ router.post("/insertinvoice", (req, res) => {
                     return res.send("Internal Server Error");
                   } 
                   else if (rResult.length === 0) {
-                   return res.send({ message: 'Client Did Not Order The Product!'});
+                    return res.send({ message: 'Client Did Not Order The Product!'});
                   }
                   else {
                     if (status === 'good stock') {
@@ -216,10 +216,10 @@ router.post("/insertinvoice", (req, res) => {
                       }
                     }
                     else if (status === 'bad stock') {
-                     return res.send({ message: 'Product cannot be sold again!'});
+                      res.send('Product cannot be sold again!');
                     }
                     else {
-                      return res.send({ message: 'Choose the status of the product!'});
+                      res.send({ message: 'Choose the status of the product!'});
                     }
                     const returnQuery = `SELECT debit, runningbalance FROM statement_of_account WHERE clientcode = ${clientcode} AND productcode = ${productcode} ORDER BY soa_id DESC`;
                     connection.query(returnQuery, (error, soaResult) => {
@@ -373,9 +373,9 @@ router.post("/insertinvoice", (req, res) => {
                     else {
                       // Insert into invoice_master table
                       const invoiceMasterQuery = `INSERT INTO invoice_master (
-                        invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment, pullout_status) VALUES 
-                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}", "Pull out Pending")`;
+                        invoicecode, invoice_date, invoice_type, salesorder_date, clientcode, name, 
+                        areaname, agentcode, a_name, netamount, discount, totalamount, pullout_status) VALUES 
+                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "Pull out Pending")`;
                       // Insert into invoice_details table
                       // (assuming the details are provided in the request body)
 
@@ -397,14 +397,14 @@ router.post("/insertinvoice", (req, res) => {
                           console.error("Error inserting into invoice_details table:", error);
                           return res.send("Internal Server Error");
                         } else {
-                          res.send("Invoice details successfully inserted!");
+                          console.log("Invoice details successfully inserted!");
                         }
 
                         if (detailsResults.affectedRows === 0) {
                           return res.send({ message: "Failed to insert data into invoice_details table"});
                         }
                         // Return success response
-                        return res.send({ message: "Invoice details successfully processed"});
+                        return res.send( "Invoice details successfully processed");
                       });
                     }
                   });
