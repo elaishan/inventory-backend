@@ -5,49 +5,55 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const SECRET_KEY = process.env.SECRET_KEY;
-const verifyToken = require("../middleware/verifyToken");
 
 router.post('/', (req, res) => {
-  const { username, password } = req.body; // Destructure username and password from req.body
-  // if(!username || !password){
-  //   return res.status(401).json(err)
-  // }
-  const query = `SELECT password FROM users WHERE username = ?`; // Use placeholders
-  connection.query(query, [username], (error, results) => { // Pass username as an array in the query
+  const { username, password } = req.body;
+
+  const query = `SELECT password, userprivilege FROM users WHERE username = ?`;
+  connection.query(query, [username], (error, results) => {
     if (error) {
       console.error('Error fetching user:', error);
+      res.status(500).json({ error: 'An error occurred during login' });
       return;
-    } else if (results.length === 0) {
-      res.send({ message: 'User not found.' });
-      console.log('User not found.');
-      return;
-    } else {
-      const user = results[0];
-      const hashedPassword = user.password;
-
-      bcrypt.compare(password, hashedPassword, (compareError, isMatch) => {
-        if (compareError) {
-          res.status(500).json({ error: 'An error occurred during login' });
-          return;
-        }
-
-        if (isMatch) {
-          console.log('Password match! User authenticated.');
-          const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' }); // Remove password from the token payload
-          res.json({ token });
-          // Proceed with further actions for authenticated users
-        } else {
-          res.status(500).json({ error: 'An error occurred during login' });
-          // Handle incorrect password scenario
-        }
-      });
     }
+
+    if (results.length === 0) {
+      res.status(404).json({ message: 'User not found.' });
+      return;
+    }
+
+    const user = results[0];
+    const hashedPassword = user.password;
+    const userprivilege = user.userprivilege;
+
+    bcrypt.compare(password, hashedPassword, (compareError, isMatch) => {
+      if (compareError) {
+        console.error('Error comparing passwords:', compareError);
+        res.status(500).json({ error: 'An error occurred during login' });
+        return;
+      }
+
+      if (isMatch) {
+        const token = jwt.sign({ username, userprivilege }, SECRET_KEY, { expiresIn: '1h' });
+        res.json({ token, userprivilege });
+      } else {
+        res.status(401).json({ message: 'Invalid password' });
+      }
+    });
   });
 });
 
-router.get('/protected', verifyToken, (req, res) => {
-  // Access user information from req.user
-  // Handle the protected route logic
+router.post('/verify-token', (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    const { username, userprivilege } = decoded;
+    res.json({ username, userprivilege });
+  } catch (error) {
+    console.error('Error verifying token:', error);
+    res.status(401).json({ error: 'Invalid token' });
+  }
 });
 
 module.exports = router;
