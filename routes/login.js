@@ -9,7 +9,9 @@ const verifyToken = require("../middleware/verifyToken");
 
 router.post('/', (req, res) => {
   const { username, password } = req.body; // Destructure username and password from req.body
-  
+  // if(!username || !password){
+  //   return res.status(401).json(err)
+  // }
   const query = `SELECT password FROM users WHERE username = ?`; // Use placeholders
   connection.query(query, [username], (error, results) => { // Pass username as an array in the query
     if (error) {
