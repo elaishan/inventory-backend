@@ -4,7 +4,9 @@ const router = express.Router();
 
 router.post("/insertagents", (req, res) => {
   const agentcode = req.body.agentcode;
-  const a_Name = req.body.a_name;
+  const a_FName = req.body.a_fname;
+  const a_LName = req.body.a_lname;
+  const a_MName = req.body.a_mname;
   const a_phoneNum = req.body.a_phonenum;
   const a_Quota = req.body.a_quota;
   const areaCode = req.body.areacode;
@@ -19,13 +21,15 @@ router.post("/insertagents", (req, res) => {
     } else {
       if (result[0].count === 0) {
         const insertQuery =
-          "INSERT INTO agents (agentcode, a_name, a_phonenum, a_quota, areacode, areaname, branchid) VALUES (?, ?, ?, ?, ?, ?, ?)";
+          "INSERT INTO agents (agentcode, a_fname, a_lname, a_mname a_phonenum, a_quota, areacode, areaname, branchid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         connection.query(
           insertQuery,
           [
             agentcode,
-            a_Name,
+            a_FName,
+            a_LName,
+            a_MName,
             a_phoneNum,
             a_Quota,
             areaCode,
@@ -81,7 +85,9 @@ router.get("/viewagents/", (req,res) => {
 router.post("/editagents/:agentid", (req, res) => {
   const {
     agentcode: agentCode,
-    a_name: agentName,
+    a_fname: a_FName,
+    a_lname: a_LName,
+    a_mname: a_MName,
     a_phonenum: phoneNum,
     a_quota: quota,
     areacode: areaCode,
@@ -100,7 +106,7 @@ router.post("/editagents/:agentid", (req, res) => {
       res.status(400).send("Agent code already exists for another agent!");
     } else {
       const updateQuery = `UPDATE agents SET
-        agentcode = ${agentCode}, a_name = "${agentName}", a_phonenum = "${phoneNum}", a_quota = "${quota}", areacode = "${areaCode}", areaname = "${areaName}", branchid = "${branchID}" WHERE agentid = ${id}`;
+        agentcode = ${agentCode}, a_fname = "${a_FName}", a_lname = "${a_LName}", a_mname = "${a_MName}",a_phonenum = "${phoneNum}", a_quota = "${quota}", areacode = "${areaCode}", areaname = "${areaName}", branchid = "${branchID}" WHERE agentid = ${id}`;
 
       connection.query(updateQuery, (err, result) => {
         if (err) {
