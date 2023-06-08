@@ -16,6 +16,7 @@ function verifyToken(req, res, next) {
 
     // Token is valid, proceed to the next middleware or route handler
     req.user = decoded;
+    console.log(req.user);
     next();
   });
 }
