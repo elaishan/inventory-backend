@@ -107,7 +107,7 @@ router.post("/insertinvoice", (req, res) => {
   } = req.body;
   
   // Validate if the client exists in the client table
-  const clientQuery = `SELECT name, areaname, agentcode FROM clients WHERE clientcode = ${clientcode}`;
+  const clientQuery = `SELECT fname, areaname, agentcode FROM clients WHERE clientcode = ${clientcode}`;
   connection.query(clientQuery, (error, clientResults) => {
     if (error) {
       console.error("Error retrieving client data:", error);
@@ -118,10 +118,10 @@ router.post("/insertinvoice", (req, res) => {
       return res.send({ message: "Invalid clientcode"});
     }
 
-    const { name, areaname } = clientResults[0];
+    const { fname, areaname } = clientResults[0];
 
     // Validate if the agent matches the client's agentcode
-    const agentQuery = `SELECT a_name FROM agents WHERE agentcode = '${agentcode}'`;
+    const agentQuery = `SELECT a_fname FROM agents WHERE agentcode = '${agentcode}'`;
     connection.query(agentQuery, (error, agentResults) => {
       if (error) {
         console.error("Error retrieving agent data:", error);
@@ -132,7 +132,7 @@ router.post("/insertinvoice", (req, res) => {
         return res.send({ message: "Invalid agentcode"});
       }
   
-      const { a_name } = agentResults[0];
+      const { a_fname } = agentResults[0];
   
       // Invoice details
       const { invoicecode: invoicecodeDetails, productcode, description, orderquantity, unitcost, linediscount, lineamount, status} = req.body;
@@ -228,7 +228,7 @@ router.post("/insertinvoice", (req, res) => {
                         return res.send("Internal Server Error");
                       } 
                       else {
-                        const { clientcode, name, productcode, totalamount, debit } = req.body;
+                        const { clientcode, fname, productcode, totalamount, debit } = req.body;
       
                         const credit = totalamount;
                         const parsedDebit = parseFloat(debit);
@@ -240,8 +240,8 @@ router.post("/insertinvoice", (req, res) => {
                         // Calculate the new running balance by subtracting credit from the running balance obtained from the database
                         const newRunningBalance = runningBalanceFromDB - credit;
       
-                        const newDebitQuery = `INSERT INTO statement_of_account (clientcode, name, refno, invoice_date, debit, credit, runningbalance, productcode) 
-                        VALUES (${clientcode}, '${name}', ${invoicecode}, '${invoice_date}', ${newDebit}, ${credit}, ${newRunningBalance}, ${productcode})`;
+                        const newDebitQuery = `INSERT INTO statement_of_account (clientcode, fname, refno, invoice_date, debit, credit, runningbalance, productcode) 
+                        VALUES (${clientcode}, '${fname}', ${invoicecode}, '${invoice_date}', ${newDebit}, ${credit}, ${newRunningBalance}, ${productcode})`;
       
                         connection.query(newDebitQuery, (error, result) => {
                           if (error) {
@@ -324,9 +324,9 @@ router.post("/insertinvoice", (req, res) => {
                     else {
                       // Insert into invoice_master table
                       const invoiceMasterQuery = `INSERT INTO invoice_master (
-                        invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                        areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment, delivery_status ) VALUES 
-                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, '${modeofpayment}', "Undelivered")`;
+                        invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, fname, 
+                        areaname, agentcode, a_fname, netamount, discount, totalamount, modeofpayment, delivery_status ) VALUES 
+                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${fname}', '${areaname}', ${agentcode}, '${a_fname}', ${netamount}, ${discount}, ${totalamount}, '${modeofpayment}', "Undelivered")`;
                       // Insert into invoice_details table
                       // (assuming the details are provided in the request body)
 
@@ -373,9 +373,9 @@ router.post("/insertinvoice", (req, res) => {
                     else {
                       // Insert into invoice_master table
                       const invoiceMasterQuery = `INSERT INTO invoice_master (
-                        invoicecode, invoice_date, invoice_type, salesorder_date, clientcode, name, 
-                        areaname, agentcode, a_name, netamount, discount, totalamount, pullout_status) VALUES 
-                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "Pull out Pending")`;
+                        invoicecode, invoice_date, invoice_type, salesorder_date, clientcode, fname, 
+                        areaname, agentcode, a_fname, netamount, discount, totalamount, pullout_status) VALUES 
+                        (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_date}', ${clientcode}, '${fname}', '${areaname}', ${agentcode}, '${a_fname}', ${netamount}, ${discount}, ${totalamount}, "Pull out Pending")`;
                       // Insert into invoice_details table
                       // (assuming the details are provided in the request body)
 
@@ -412,9 +412,9 @@ router.post("/insertinvoice", (req, res) => {
                 else {
                   // Insert into invoice_master table
                   const invoiceMasterQuery = `INSERT INTO invoice_master (
-                    invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, name, 
-                    areaname, agentcode, a_name, netamount, discount, totalamount, modeofpayment, delivery_status) VALUES 
-                    (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${name}', '${areaname}', ${agentcode}, '${a_name}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}", "Undelivered")`;
+                    invoicecode, invoice_date, invoice_type, salesorder_reason, salesorder_date, clientcode, fname, 
+                    areaname, agentcode, a_fname, netamount, discount, totalamount, modeofpayment, delivery_status) VALUES 
+                    (${invoicecode}, '${invoice_date}', '${invoice_type}', '${salesorder_reason}', '${salesorder_date}', ${clientcode}, '${fname}', '${areaname}', ${agentcode}, '${a_fname}', ${netamount}, ${discount}, ${totalamount}, "${modeofpayment}", "Undelivered")`;
                   // Insert into invoice_details table
                   // (assuming the details are provided in the request body)
 
@@ -450,14 +450,14 @@ router.post("/insertinvoice", (req, res) => {
                           console.error("Error querying statement of account table:", error);
                           return res.send("Internal Server Error");
                         } else {
-                          const { clientcode, name, invoicecode, invoice_date, totalamount, runningbalance } = req.body;
+                          const { clientcode, fname, invoicecode, invoice_date, totalamount, runningbalance } = req.body;
                           const debit = totalamount;
 
                           if (soaResult.length > 0) {
                             const runningbalance = parseFloat(soaResult[0].runningbalance) + debit;
 
                             const insertSOA = `INSERT INTO statement_of_account (clientcode, name, refno, invoice_date, debit, runningbalance, productcode) 
-                            VALUES (${clientcode}, '${name}', ${invoicecode}, '${invoice_date}', ${debit}, ${runningbalance}, ${productcode} )`;
+                            VALUES (${clientcode}, '${fname}', ${invoicecode}, '${invoice_date}', ${debit}, ${runningbalance}, ${productcode} )`;
 
                             connection.query(insertSOA, (error, result) => {
                               if (error) {
@@ -473,8 +473,8 @@ router.post("/insertinvoice", (req, res) => {
                           } else {
                             const runningbalance = debit;
 
-                            const insertSOA = `INSERT INTO statement_of_account (clientcode, name, refno, invoice_date, debit, runningbalance, productcode) 
-                            VALUES (${clientcode}, '${name}', ${invoicecode}, '${invoice_date}', ${debit}, ${runningbalance}, ${productcode} )`;
+                            const insertSOA = `INSERT INTO statement_of_account (clientcode, fname, refno, invoice_date, debit, runningbalance, productcode) 
+                            VALUES (${clientcode}, '${fname}', ${invoicecode}, '${invoice_date}', ${debit}, ${runningbalance}, ${productcode} )`;
 
                             connection.query(insertSOA, (error, result) => {
                               if (error) {
