@@ -3,7 +3,6 @@ const router = express.Router();
 const connection = require("../dbconnection");
 
 router.get("/clients/", (req,res) => {
-  const clientcode = req.params.clientcode
   //fetch data of selected the client from the clients table
   connection.query("SELECT * FROM statement_of_account ORDER BY soa_id DESC", function(error, result, fields){
     if(error){
@@ -42,8 +41,8 @@ router.get("/soa/:clientcode", (req,res) => {
 
 
 router.post("/insert-memo", (req, res) => {
-  const { clientcode, name } = req.body;
-  const selectClient = `SELECT runningbalance FROM statement_of_account WHERE clientcode = ${clientcode} AND name = '${name}' ORDER BY soa_id DESC LIMIT 1`;
+  const { clientcode, fname } = req.body;
+  const selectClient = `SELECT runningbalance FROM statement_of_account WHERE clientcode = ${clientcode} AND fname = '${fname}' ORDER BY soa_id DESC LIMIT 1`;
 
   connection.query(selectClient, (err, result) => {
 
@@ -70,16 +69,16 @@ router.post("/insert-memo", (req, res) => {
           // Calculate the new running balance by subtracting credit from the running balance obtained from the database
           const newRunningBalance = runningbalance - credit;
 
-          const insertStatement = `INSERT INTO statement_of_account (clientcode, name, refno, invoice_date, debit, credit, runningbalance, productcode) 
-          VALUES (${clientcode}, '${name}', ${memocode}, '${memo_date}', ${debit}, ${credit}, ${newRunningBalance}, ${productcode})`;
+          const insertStatement = `INSERT INTO statement_of_account (clientcode, fname, refno, invoice_date, debit, credit, runningbalance, productcode) 
+          VALUES (${clientcode}, '${fname}', ${memocode}, '${memo_date}', ${debit}, ${credit}, ${newRunningBalance}, ${productcode})`;
 
           connection.query(insertStatement, (err, result) => {
             if (err) {
               res.send(err);
             } else {
               // Insert the new running balance into the balanceamount column of the payments table
-              const insertPayment = `INSERT INTO memo (memotype, memocode, memo_date, clientcode, name, totalamount, balanceamount, remarks) 
-                VALUES ("${memotype}" , ${memocode}, '${memo_date}', ${clientcode}, '${name}', ${parsedTotalAmount}, ${newRunningBalance}, '${remarks}')`;
+              const insertPayment = `INSERT INTO memo (memotype, memocode, memo_date, clientcode, fname, totalamount, balanceamount, remarks) 
+                VALUES ("${memotype}" , ${memocode}, '${memo_date}', ${clientcode}, '${fname}', ${parsedTotalAmount}, ${newRunningBalance}, '${remarks}')`;
               connection.query(insertPayment, (err, result) => {
                 if (err) {
                   res.send(err); // Set appropriate status code and send the error message
@@ -100,16 +99,16 @@ router.post("/insert-memo", (req, res) => {
         // Calculate the new running balance by adding debit from the running balance obtained from the database
         const newRunningBalance = runningbalance + debit;
 
-        const insertStatement = `INSERT INTO statement_of_account (clientcode, name, refno, invoice_date, debit, credit, runningbalance, productcode) 
-        VALUES (${clientcode}, '${name}', ${memocode}, '${memo_date}', ${debit}, ${credit}, ${newRunningBalance}, ${productcode})`;
+        const insertStatement = `INSERT INTO statement_of_account (clientcode, fname, refno, invoice_date, debit, credit, runningbalance, productcode) 
+        VALUES (${clientcode}, '${fname}', ${memocode}, '${memo_date}', ${debit}, ${credit}, ${newRunningBalance}, ${productcode})`;
 
         connection.query(insertStatement, (err, result) => {
           if (err) {
             res.send(err);
           } else {
             // Insert the new running balance into the balanceamount column of the payments table
-            const insertPayment = `INSERT INTO memo (memotype, memocode, memo_date, clientcode, name, totalamount, balanceamount, remarks) 
-              VALUES ("${memotype}" , ${memocode}, '${memo_date}', ${clientcode}, '${name}', ${parsedTotalAmount}, ${newRunningBalance}, '${remarks}')`;
+            const insertPayment = `INSERT INTO memo (memotype, memocode, memo_date, clientcode, fname, totalamount, balanceamount, remarks) 
+              VALUES ("${memotype}" , ${memocode}, '${memo_date}', ${clientcode}, '${fname}', ${parsedTotalAmount}, ${newRunningBalance}, '${remarks}')`;
             connection.query(insertPayment, (err, result) => {
               if (err) {
                 res.send(err); // Set appropriate status code and send the error message
