@@ -21,7 +21,7 @@ router.post("/insertagents", (req, res) => {
     } else {
       if (result[0].count === 0) {
         const insertQuery =
-          "INSERT INTO agents (agentcode, a_fname, a_lname, a_mname a_phonenum, a_quota, areacode, areaname, branchid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+          "INSERT INTO agents (agentcode, a_fname, a_lname, a_mname, a_phonenum, a_quota, areacode, areaname, branchid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         connection.query(
           insertQuery,
