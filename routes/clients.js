@@ -5,7 +5,7 @@ const router = express.Router();
 
 // INSERT
 router.post("/insertclients", (req, res) => {
-  const { clientcode, fname, mname, lname, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid } = req.body;
+  const { clientcode, fname, mname, lname, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid, client_type } = req.body;
 
   const selectAgentSql = `SELECT agentcode FROM agents WHERE agentcode = '${agentcode}'`;
 
@@ -34,8 +34,8 @@ router.post("/insertclients", (req, res) => {
           res.send({ message: "Client code already exists for an existing client." });
         } else {
           // Query to insert new client into table "clients"
-          const insertSql = `INSERT INTO clients (clientcode, fname, mname, lname, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid) 
-                              VALUES ("${clientcode}", "${fname}", "${mname}", "${lname}", ${phonenumber},"${areacode}", "${areaname}", ${agentcode}, ${creditlimit}, ${terms}, ${branchid})`;
+          const insertSql = `INSERT INTO clients (clientcode, fname, mname, lname, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid, client_type) 
+                              VALUES ("${clientcode}", "${fname}", "${mname}", "${lname}", ${phonenumber},"${areacode}", "${areaname}", ${agentcode}, ${creditlimit}, ${terms}, ${branchid}, "${client_type}")`;
 
           connection.query(insertSql, function (err, result, fields) {
             if (err) {
@@ -88,7 +88,7 @@ router.get("/viewclients/", (req,res) => {
 //UPDATE
 router.put("/editclients/:clientid", (req, res) => {
   
-  const { clientcode, fname, mname, lname, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid } = req.body;
+  const { clientcode, fname, mname, lname, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid, client_type } = req.body;
   const id = req.params.clientid;
 
   const selectSql = `SELECT * FROM clients WHERE clientcode = ? AND clientid != ?`;
@@ -125,8 +125,8 @@ router.put("/editclients/:clientid", (req, res) => {
             res.send({ message: "Client code already exists for an existing client." });
             } else {
                 // Query to update the client in table "clients"
-                const updateSql = `UPDATE clients SET clientcode = ?, fname = ?, mname = ?, lname = ?, phonenumber = ?, areacode = ?, areaname = ?, agentcode = ?, creditlimit = ?, terms = ?, branchid = ? WHERE clientid = ?`;
-                const updateParams = [clientcode, fname, mname, lname, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid, id];
+                const updateSql = `UPDATE clients SET clientcode = ?, fname = ?, mname = ?, lname = ?, phonenumber = ?, areacode = ?, areaname = ?, agentcode = ?, creditlimit = ?, terms = ?, branchid = ?, client_type = ? WHERE clientid = ?`;
+                const updateParams = [clientcode, fname, mname, lname, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid, client_type, id];
 
                 connection.query(updateSql, updateParams, function (err, result, fields) {
                 if (err) {
