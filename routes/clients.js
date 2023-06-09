@@ -40,7 +40,7 @@ router.post("/insertclients", (req, res) => {
           connection.query(insertSql, function (err, result, fields) {
             if (err) {
               // Return error message to client
-              res.send({ message: "Bakit ayaw gumana ng add" });
+              res.send(err);
             } else {
               // Return success message to client
               res.send({ success: "Client added successfully." });
