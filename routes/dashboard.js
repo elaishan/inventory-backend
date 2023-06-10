@@ -69,4 +69,43 @@ router.get("/", (req, res) => {
   });
 });
 
+router.get('/product-info/:productcode', (req, res) => {
+  const productcode = req.params.productcode;
+
+  if (!productcode) {
+    res.status(400).json({ error: 'Product code is missing' });
+    return;
+  }
+
+  const query = `
+  SELECT i.productcode, p.description, p.category, p.reorderlevel, p.manufacturer, p.cost, p.form, p.price
+  FROM invoice_details AS i
+  INNER JOIN stocks AS p ON i.productcode = p.productcode
+  WHERE i.productcode = ?
+  GROUP BY i.productcode, p.description, p.category, p.reorderlevel, p.manufacturer, p.cost, p.form, p.price 
+  LIMIT 1
+`;
+
+
+
+  connection.query(query, [productcode], (err, results) => {
+    if (err) {
+      res.send({ error: 'Error executing the query' });
+      throw err;
+    }
+
+    if (results.length === 0) {
+      res.send({ error: 'Product not found' });
+      return;
+    }
+
+    // Process the query results
+    const product = results[0];
+    res.send(product);
+  });
+});
+
+
+
+
 module.exports = router;

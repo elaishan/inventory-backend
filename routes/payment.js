@@ -42,8 +42,8 @@ router.get("/soa/:clientcode", (req,res) => {
 
 
 router.post("/insert-payment", (req, res) => {
-  const { clientcode, name } = req.body;
-  const selectClient = `SELECT runningbalance FROM statement_of_account WHERE clientcode = ${clientcode} AND name = '${name}' ORDER BY soa_id DESC LIMIT 1`;
+  const { clientcode, fname } = req.body;
+  const selectClient = `SELECT runningbalance FROM statement_of_account WHERE clientcode = ${clientcode} AND fname = '${fname}' ORDER BY soa_id DESC LIMIT 1`;
 
   connection.query(selectClient, (err, result) => {
     if (err) {
@@ -67,16 +67,16 @@ router.post("/insert-payment", (req, res) => {
         const newRunningBalance = runningbalance - credit;
         const runningbal = runningbalance;
 
-        const insertStatement = `INSERT INTO statement_of_account (clientcode, name, refno, invoice_date, debit, credit, runningbalance, productcode) 
-        VALUES (${clientcode}, '${name}', ${orpr}, '${or_date}', ${debit}, ${credit}, ${newRunningBalance}, ${productcode})`;
+        const insertStatement = `INSERT INTO statement_of_account (clientcode, fname, refno, invoice_date, debit, credit, runningbalance, productcode) 
+        VALUES (${clientcode}, '${fname}', ${orpr}, '${or_date}', ${debit}, ${credit}, ${newRunningBalance}, ${productcode})`;
 
         connection.query(insertStatement, (err, result) => {
           if (err) {
             res.send(err);
           } else {
             // Insert the new running balance into the balanceamount column of the payments table
-            const insertPayment = `INSERT INTO payments (orpr, or_date, clientcode, name, totalamount, balanceamount) 
-              VALUES (${orpr}, '${or_date}', ${clientcode}, '${name}', ${parsedTotalAmount}, ${runningbal})`;
+            const insertPayment = `INSERT INTO payments (orpr, or_date, clientcode, fname, totalamount, balanceamount) 
+              VALUES (${orpr}, '${or_date}', ${clientcode}, '${fname}', ${parsedTotalAmount}, ${runningbal})`;
             connection.query(insertPayment, (err, result) => {
               if (err) {
                 res.send(err); // Set appropriate status code and send the error message
