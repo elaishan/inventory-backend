@@ -5,6 +5,7 @@ const connection = mysql2.createConnection({
     database: 'inventory',
     user:'root',
     password:'12345',
+
 });
 
 connection.connect(function(err){

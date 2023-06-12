@@ -86,7 +86,7 @@ router.get("/viewclients/", (req,res) => {
 /*========================================================================================================================*/
 
 //UPDATE
-router.put("/editclients/:clientid", (req, res) => {
+router.post("/editclients/:clientid", (req, res) => {
   
   const { clientcode, fname, mname, lname, phonenumber, areacode, areaname, agentcode, creditlimit, terms, branchid, client_type } = req.body;
   const id = req.params.clientid;
