@@ -26,7 +26,7 @@ router.get("/graph", (req, res) => {
 
   const query = `
   SELECT invoice_details.orderquantity, invoice_master.salesorder_date, 
-  invoice_master.a_name, invoice_master.areaname
+  invoice_master.a_fname, invoice_master.areaname
   FROM invoice_details
   INNER JOIN invoice_master ON invoice_details.invoicecode = invoice_master.invoicecode
   WHERE invoice_master.invoice_type IN ('sales', 'charge sales')
