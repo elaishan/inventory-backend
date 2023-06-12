@@ -25,13 +25,13 @@ router.get("/graph", (req, res) => {
   const productcode = req.query.productcode;
 
   const query = `
-  SELECT invoice_details.orderquantity, invoice_master.salesorder_date
+  SELECT invoice_details.orderquantity, invoice_master.salesorder_date, 
+  invoice_master.a_fname, invoice_master.areaname
   FROM invoice_details
   INNER JOIN invoice_master ON invoice_details.invoicecode = invoice_master.invoicecode
   WHERE invoice_master.invoice_type IN ('sales', 'charge sales')
   AND invoice_details.productcode = '${productcode}' 
   ${url}`;
-
 
   connection.query(query, function (error, result, fields) {
     if (error) {
@@ -52,7 +52,7 @@ router.get("/", (req, res) => {
   }
 
   const query = `
-    SELECT invoice_details.*
+    SELECT invoice_details.*, invoice_master.*
     FROM invoice_details
     INNER JOIN invoice_master ON invoice_details.invoicecode = invoice_master.invoicecode
     WHERE invoice_master.invoice_type IN ('sales', 'charge sales')
